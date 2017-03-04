@@ -1,0 +1,9 @@
+{
+  "name": "lenticular",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0"
+  }
+}
