@@ -20,32 +20,39 @@ var Lenticula = function (options) {
       htmlImg.addEventListener('load', function() {
         console.log('loaded')
         _this.ctx.drawImage(htmlImg, 0, 0, htmlImg.naturalWidth, htmlImg.naturalHeight, 0, 0, _this.canvas.clientWidth, _this.canvas.clientHeight)
-        _this.imageData[imageIndex] = _this.ctx.getImageData(0, 0, _this.canvas.clientWidth, _this.canvas.clientHeight)
+        const currImageData = _this.ctx.getImageData(0, 0, _this.canvas.clientWidth, _this.canvas.clientHeight)
+        _this.imageData[imageIndex] = JSON.parse(JSON.stringify(currImageData))
       }, false);
       htmlImg.crossOrigin = "Anonymous"
       htmlImg.src = image.src
     })
 
-    _this.canvas.addEventListener("click", () => { _this.redraw() })
+    _this.canvas.addEventListener("click", () => { _this.redraw(0.5) })
   }
 
   // Redraw canvas
-  this.redraw = () => {
-    console.log(_this.imageData)
+  this.redraw = (balance) => {
     const imageData = _this.ctx.getImageData(0, 0, _this.canvas.clientWidth, _this.canvas.clientHeight)
 
     let data = imageData.data
 
-    // only works if width is even num
-    for (var i = 0; i < data.length; i += 8) {
-      data[i + 3] = 0; // alpha
+    const stripWidth = 64
+
+    for (let i = 0; i < data.length; i += 4) {
+      const set = ((i % stripWidth) >= (stripWidth * balance)) ? 1 : 0
+      // need some end-of-line reset for larger strip widths
+
+      data[i]     = _this.imageData[set].data[i]; // r
+      data[i + 1] = _this.imageData[set].data[i + 1]; // g
+      data[i + 2] = _this.imageData[set].data[i + 2]; // b
+      data[i + 3] = _this.imageData[set].data[i + 3]; // a
     }
     _this.ctx.putImageData(imageData, 0, 0, 0, 0, _this.canvas.clientWidth, _this.canvas.clientHeight)
   }
 }
 
-var lenticulars = document.querySelectorAll('[data-lenticular-list]');
-var instances = [];
+let lenticulars = document.querySelectorAll('[data-lenticular-list]');
+let instances = [];
 // convert → array & loop through
 [...lenticulars].map((el, i) => {
   // store instance in array for further manipulation

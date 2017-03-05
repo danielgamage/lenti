@@ -12,14 +12,13 @@ html,
 body {
     height: 100%;
 }
+[data-lenticular-list] img {
+  display: none;
+}
 canvas {
   max-width: 100%;
   height: auto;
   position: absolute;
-}
-
-#layer-2 {
-  opacity: 0.5
 }
 
 body {
