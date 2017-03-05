@@ -1,16 +1,21 @@
 [...Array(2).keys()].map((el, i, arr) => {
     let layer = document.querySelector(`#layer-${i + 1}`)
     let ctx = layer.getContext('2d')
-    var img = new Image()
+    let img = new Image()
+    const imageWidth = 720
+    const imageHeight = 480
     img.crossOrigin = "Anonymous";
-    img.src = `http://placekitten.com/700/500?image=${i + 1}`
+    img.src = `http://placekitten.com/${imageWidth}/${imageHeight}?image=${i * 2}`
+    let width
+    let height
     let ctxImageData
     img.onload = () => {
-        ctx.drawImage(img, 0, 0)
+        width = layer.clientWidth
+        height = layer.clientHeight
+        ctx.drawImage(img, 0, 0, 700, 500, 0, 0, width, height)
         ctxImageData = ctx.getImageData(0,0,width, height)
     }
-    const width = window.innerWidth
-    const height = window.innerHeight
+
     layer.addEventListener("click", () => { redraw(ctxImageData, ctx, width, height) })
 })
 const redraw = (imageData, ctx, width, height) => {
