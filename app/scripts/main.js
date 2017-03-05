@@ -27,7 +27,8 @@ var Lenticula = function (options) {
       htmlImg.src = image.src
     })
 
-    _this.canvas.addEventListener("mousemove", _this.handleMouse)
+    _this.canvas.addEventListener(`mousemove`,   _this.handleMouse)
+    window.addEventListener(`deviceorientation`, _this.handleOrientation)
   }
 
   // Redraw canvas
@@ -36,10 +37,10 @@ var Lenticula = function (options) {
 
     let data = imageData.data
 
-    const stripWidth = 16
+    const stripWidth = 50
 
     for (let i = 0; i < data.length; i += 4) {
-      const set = ((i % stripWidth) >= (stripWidth * balance)) ? 1 : 0
+      const set = ((i / 4 % stripWidth) >= (stripWidth * balance)) ? 1 : 0
       // need some end-of-line reset for larger strip widths
 
       data[i]     = _this.imageData[set].data[i]; // r
@@ -52,7 +53,14 @@ var Lenticula = function (options) {
 
   this.handleMouse = (e) => {
     _this.redraw(e.offsetX / _this.canvas.clientWidth)
-
+  }
+  this.handleOrientation = (e) => {
+    const clamped = Math.max(Math.min(e.gamma, 45), -45)
+    const balance = _this.remap(clamped, -45, 45, 0, 1)
+    _this.redraw(balance)
+  }
+  this.remap = (value, inLow, inHigh, outLow, outHigh) => {
+    return ( outLow + (value - inLow) * (outHigh - outLow) / (inHigh - inLow) )
   }
 }
 
