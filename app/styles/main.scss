@@ -1,5 +1,10 @@
 // bower:scss
 // endbower
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 .browserupgrade {
   margin: 0.2em 0;
