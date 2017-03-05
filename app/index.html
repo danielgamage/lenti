@@ -49,5 +49,16 @@
     <!-- build:js scripts/main.js -->
     <script src="scripts/main.js"></script>
     <!-- endbuild -->
+    <script>
+      let lenticulars = document.querySelectorAll('[data-lenticular-list]')
+      let instances = []
+      // convert → array & loop through
+      ;[...lenticulars].map((el, i) => {
+        // store instance in array for further manipulation
+        instances[i] = new Lenticula({container: el})
+        // initialize instance
+        instances[i].init()
+      })
+    </script>
   </body>
 </html>

@@ -64,13 +64,3 @@ var Lenticula = function (options) {
     return ( outLow + (value - inLow) * (outHigh - outLow) / (inHigh - inLow) )
   }
 }
-
-let lenticulars = document.querySelectorAll('[data-lenticular-list]')
-let instances = []
-// convert → array & loop through
-;[...lenticulars].map((el, i) => {
-  // store instance in array for further manipulation
-  instances[i] = new Lenticula({container: el})
-  // initialize instance
-  instances[i].init()
-})
