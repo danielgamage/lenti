@@ -5,10 +5,11 @@ var Lenticula = function (options) {
   this.container = options.container
   this.imageData
 
+
   // Initialize
   this.init = () => {
     _this.images = [..._this.container.querySelectorAll(`img`)]
-    _this.imageData = [..._this.images]
+    _this.imageDataArray = [..._this.images]
     _this.container.innerHTML += `<canvas />`
     _this.canvas = _this.container.querySelector(`canvas`)
     _this.ctx = _this.canvas.getContext(`2d`)
@@ -16,6 +17,8 @@ var Lenticula = function (options) {
     _this.canvas.setAttribute(`height`, `500`)
     _this.canvasWidth = _this.canvas.clientWidth
     _this.canvasHeight = _this.canvas.clientHeight
+    _this.imageData = _this.ctx.getImageData(0, 0, _this.canvasWidth, _this.canvasHeight)
+    _this.stripWidth = 16
 
     _this.images.map((image, imageIndex) => {
       let htmlImg = new Image()
@@ -23,7 +26,7 @@ var Lenticula = function (options) {
         console.log('loaded')
         _this.ctx.drawImage(htmlImg, 0, 0, htmlImg.naturalWidth, htmlImg.naturalHeight, 0, 0, _this.canvasWidth, _this.canvas.clientHeight)
         const currImageData = _this.ctx.getImageData(0, 0, _this.canvasWidth, _this.canvas.clientHeight)
-        _this.imageData[imageIndex] = JSON.parse(JSON.stringify(currImageData))
+        _this.imageDataArray[imageIndex] = JSON.parse(JSON.stringify(currImageData))
       }, false);
       htmlImg.crossOrigin = "Anonymous"
       htmlImg.src = image.src
@@ -35,22 +38,18 @@ var Lenticula = function (options) {
 
   // Redraw canvas
   this.redraw = (balance) => {
-    const imageData = _this.ctx.getImageData(0, 0, _this.canvasWidth, _this.canvasHeight)
-
-    let data = imageData.data
-
-    const stripWidth = 8
+    let data = _this.imageData.data
 
     for (let i = 0; i < data.length; i += 4) {
-      const set = Math.floor(((((i / 4) % _this.canvasWidth) % stripWidth) / stripWidth) + (balance * _this.images.length))
-      const setClamped = Math.min(Math.max(set, 0), _this.images.length)
-        // console.log(setClamped)
-      data[i]     = _this.imageData[setClamped].data[i]; // r
-      data[i + 1] = _this.imageData[setClamped].data[i + 1]; // g
-      data[i + 2] = _this.imageData[setClamped].data[i + 2]; // b
-      data[i + 3] = _this.imageData[setClamped].data[i + 3]; // a
+      const set = ((((i / 4) % _this.canvasWidth) % _this.stripWidth) / _this.stripWidth) + (balance * _this.images.length)
+      const setClamped = Math.min(Math.max(Math.floor(set), 0), (_this.images.length - 1))
+
+      data[i]     = _this.imageDataArray[setClamped].data[i]     // r
+      data[i + 1] = _this.imageDataArray[setClamped].data[i + 1] // g
+      data[i + 2] = _this.imageDataArray[setClamped].data[i + 2] // b
+      data[i + 3] = _this.imageDataArray[setClamped].data[i + 3] // a
     }
-    _this.ctx.putImageData(imageData, 0, 0, 0, 0, _this.canvasWidth, _this.canvasHeight)
+    _this.ctx.putImageData(_this.imageData, 0, 0, 0, 0, _this.canvasWidth, _this.canvasHeight)
   }
 
   this.handleMouse = (e) => {
