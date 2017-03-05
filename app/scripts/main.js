@@ -15,6 +15,7 @@ var Lenticula = function (options) {
     _this.canvas.setAttribute(`width`, `500`)
     _this.canvas.setAttribute(`height`, `500`)
     _this.canvasWidth = _this.canvas.clientWidth
+    _this.canvasHeight = _this.canvas.clientHeight
 
     _this.images.map((image, imageIndex) => {
       let htmlImg = new Image()
@@ -34,11 +35,11 @@ var Lenticula = function (options) {
 
   // Redraw canvas
   this.redraw = (balance) => {
-    const imageData = _this.ctx.getImageData(0, 0, _this.canvasWidth, _this.canvas.clientHeight)
+    const imageData = _this.ctx.getImageData(0, 0, _this.canvasWidth, _this.canvasHeight)
 
     let data = imageData.data
 
-    const stripWidth = 16
+    const stripWidth = 8
 
     for (let i = 0; i < data.length; i += 4) {
       const set = Math.floor(((((i / 4) % _this.canvasWidth) % stripWidth) / stripWidth) + (balance * _this.images.length))
@@ -49,7 +50,7 @@ var Lenticula = function (options) {
       data[i + 2] = _this.imageData[setClamped].data[i + 2]; // b
       data[i + 3] = _this.imageData[setClamped].data[i + 3]; // a
     }
-    _this.ctx.putImageData(imageData, 0, 0, 0, 0, _this.canvasWidth, _this.canvas.clientHeight)
+    _this.ctx.putImageData(imageData, 0, 0, 0, 0, _this.canvasWidth, _this.canvasHeight)
   }
 
   this.handleMouse = (e) => {
