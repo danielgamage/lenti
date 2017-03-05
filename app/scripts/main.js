@@ -27,7 +27,7 @@ var Lenticula = function (options) {
       htmlImg.src = image.src
     })
 
-    _this.canvas.addEventListener("click", () => { _this.redraw(0.5) })
+    _this.canvas.addEventListener("mousemove", _this.handleMouse)
   }
 
   // Redraw canvas
@@ -36,7 +36,7 @@ var Lenticula = function (options) {
 
     let data = imageData.data
 
-    const stripWidth = 64
+    const stripWidth = 16
 
     for (let i = 0; i < data.length; i += 4) {
       const set = ((i % stripWidth) >= (stripWidth * balance)) ? 1 : 0
@@ -48,6 +48,11 @@ var Lenticula = function (options) {
       data[i + 3] = _this.imageData[set].data[i + 3]; // a
     }
     _this.ctx.putImageData(imageData, 0, 0, 0, 0, _this.canvas.clientWidth, _this.canvas.clientHeight)
+  }
+
+  this.handleMouse = (e) => {
+    _this.redraw(e.offsetX / _this.canvas.clientWidth)
+
   }
 }
 
