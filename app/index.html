@@ -55,7 +55,7 @@
       // convert → array & loop through
       ;[...lenticulars].map((el, i) => {
         // store instance in array for further manipulation
-        instances[i] = new Lenticula({container: el})
+        instances[i] = new Lenticula({container: el, width: 1280, height: 720})
         // initialize instance
         instances[i].init()
       })
