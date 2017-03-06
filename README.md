@@ -7,13 +7,56 @@
 $ npm install --save lenti
 ```
 
-## Usage
+## Basic Usage
+```html
+<div data-lenticular-list="true" >
+  <img src="assets/images/1.jpg" alt="Blue Image" width="1280" height="720" />
+  <img src="assets/images/2.jpg" alt="Blue Image" width="1280" height="720" />
+  <img src="assets/images/3.jpg" alt="Blue Image" width="1280" height="720" />
+  <img src="assets/images/4.jpg" alt="Blue Image" width="1280" height="720" />
+</div>
+```
 
 ```js
-var lenti = require('lenti');
+import Lenti from 'lenti'
 
-lenti('Rainbow');
+let lenticulars = document.querySelectorAll('[data-lenticular-list]')
+let instances = []
+// convert → array & loop through
+;[...lenticulars].map((el, i) => {
+  // store instance in array for further manipulation
+  instances[i] = new Lenti({container: el, width: 1280, height: 720})
+  // initialize instance
+  instances[i].init()
+})
 ```
+
+Lenti doesn't make too many assumptions about your environment. You may turn off the default event handlers (see `accelerometerEvents` and `mouseEvents`) and make your own interaction system. Just send a value between 0–1 to your instance at `Lenti.redraw()`.
+
+## Options
+
+#### `container`
+**Required**
+
+Specifies the HTMLElement (not selector) that contains the images.
+#### `accelerometerEvents`
+**default**: true
+
+Turns tilt interaction on or off.
+
+#### `mouseEvents`
+**default**: true
+
+Turns mouse hover interaction on or off.
+
+#### `stripWidth`
+**default**: 16
+The horizontal width (in pixels) of each lens strip.
+
+#### `height` & `width`
+**default**: 50
+The height and width of the canvas (in pixels). You **definitely should** match this to the value of your images (which should all be the same size)
+
 ## License
 
 Apache-2.0 © [Daniel Gamage](https://danielgamage.com)
