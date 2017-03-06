@@ -13,10 +13,21 @@ html, body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
-* {
-	box-sizing: border-box;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 #app {
 	height: 100%;
+}
+
+[data-lenticular-list] img {
+  display: none;
+}
+canvas {
+  max-width: 100%;
+  height: auto;
+  position: absolute;
 }
