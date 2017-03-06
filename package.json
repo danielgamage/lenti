@@ -1,6 +1,7 @@
 {
   "name": "preact-boilerplate",
   "version": "5.0.0",
+  "homepage": "https://danielgamage.github.io/lenti/",
   "description": "Ready-to-go Preact starter project powered by webpack.",
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --inline --hot --progress",
@@ -10,7 +11,8 @@
     "prebuild": "mkdirp build && ncp src/assets build/assets",
     "test": "npm run -s lint && npm run -s test:karma",
     "test:karma": "karma start test/karma.conf.js --single-run",
-    "lint": "eslint {src,test}"
+    "lint": "eslint {src,test}",
+    "deploy": "gh-pages -d build"
   },
   "keywords": [
     "preact",
@@ -39,6 +41,7 @@
     "eslint": "^3.0.1",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.10.0",
+    "gh-pages": "^0.12.0",
     "html-webpack-plugin": "^2.22.0",
     "isparta-loader": "^2.0.0",
     "json-loader": "^0.5.4",
