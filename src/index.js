@@ -11,8 +11,9 @@ class Lenti {
 
     this.bindEvents = this.bindEvents.bind(this)
     this.init = this.init.bind(this)
+    this.sampleImages = this.sampleImages.bind(this)
     this.getImage = this.getImage.bind(this)
-    this.handleResize = this.handleResize.bind(this)
+    this.handleSizing = this.handleSizing.bind(this)
     this.bindEvents = this.bindEvents.bind(this)
     this.destroy = this.destroy.bind(this)
     this.redraw = this.redraw.bind(this)
@@ -24,29 +25,31 @@ class Lenti {
   // Initialize
   init () {
     this.images = [...this.container.querySelectorAll(`img`)]
-    this.imageDataArray = [...Array(this.images.length).keys()] // empty array w/ same length as this.images
+    this.imageCount = this.images.length
+    this.imageDataArray = [...Array(this.imageCount).keys()] // empty array w/ same length as this.images
     this.container.innerHTML += `<canvas />`
     this.canvas = this.container.querySelector(`canvas`)
     this.ctx = this.canvas.getContext(`2d`)
-    this.canvas.setAttribute(`width`, this.width)
-    this.canvas.setAttribute(`height`, this.height)
-    this.canvasWidth = this.canvas.clientWidth
-    this.canvasHeight = this.canvas.clientHeight
-    this.imageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
-
-    this.images.map((imageEl, imageIndex) => {
-      let htmlImg = new window.Image()
-      htmlImg.addEventListener(`load`, function () {
-        this.getImage(imageEl, imageIndex)
-      }.bind(this))
-      htmlImg.crossOrigin = `Anonymous`
-      htmlImg.src = imageEl.src
-      return imageEl
-    })
-
+    this.handleSizing()
     this.bindEvents()
   }
 
+  // Sample image
+  sampleImages() {
+    this.images.map((imageEl, imageIndex) => {
+      if (this.imageDataArray[0]) {
+        this.getImage(imageEl, imageIndex)
+      } else {
+        let htmlImg = new window.Image()
+        htmlImg.addEventListener(`load`, function () {
+          this.getImage(imageEl, imageIndex)
+        }.bind(this))
+        htmlImg.crossOrigin = `Anonymous`
+        htmlImg.src = imageEl.src
+        return imageEl
+      }
+    })
+  }
   getImage (image, imageIndex) {
     this.ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, this.canvasWidth, this.canvas.clientHeight)
     const currImageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvas.clientHeight)
@@ -54,9 +57,15 @@ class Lenti {
   }
 
   // Handle window resize
-  handleResize () {
+  handleSizing () {
     this.canvasWidth = this.canvas.clientWidth
-    this.canvasHeight = this.canvas.clientHeight
+    this.canvasHeight = this.canvasWidth * (this.height / this.width)
+    this.canvas.setAttribute(`width`, this.canvasWidth)
+    this.canvas.setAttribute(`height`, this.canvasHeight)
+    // Resample images
+    // careful on the fire rate here.
+    this.sampleImages()
+    this.imageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
   }
 
   // Event Binding
@@ -67,14 +76,14 @@ class Lenti {
     if (this.accelerometerEvents) {
       window.addEventListener(`deviceorientation`, this.handleOrientation)
     }
-    window.addEventListener(`resize`, this.handleResize)
+    window.addEventListener(`resize`, this.handleSizing)
   }
 
   // Event Unbinding
   destroy () {
     this.canvas.addEventListener(`mousemove`, this.handleMouse)
     window.addEventListener(`deviceorientation`, this.handleOrientation)
-    window.removeEventListener(`resize`, this.handleResize)
+    window.removeEventListener(`resize`, this.handleSizing)
   }
 
   // Redraw canvas
@@ -83,9 +92,11 @@ class Lenti {
     if (this.imageDataArray[0]) {
       let data = this.imageData.data
 
+      const addOn = (balance * this.imageCount) - 0.5
+
       for (let i = 0; i < data.length; i += 4) {
-        const set = (i / 4 % this.canvasWidth % this.stripWidth / this.stripWidth) + (balance * this.images.length) - 0.5
-        const setClamped = Math.floor(Math.min(Math.max(set, 0), this.images.length - 1))
+        const set = (i / 4 % this.canvasWidth % this.stripWidth / this.stripWidth) + addOn
+        const setClamped = Math.floor(Math.min(Math.max(set, 0), this.imageCount - 1))
 
         data[i + 0] = this.imageDataArray[setClamped].data[i + 0] // r
         data[i + 1] = this.imageDataArray[setClamped].data[i + 1] // g
