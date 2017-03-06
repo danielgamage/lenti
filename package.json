@@ -33,6 +33,7 @@
   },
   "scripts": {
     "prepublish": "nsp check",
+    "watch": "babel --watch src --out-dir lib",
     "build": "babel src --out-dir lib",
     "pretest": "eslint **/*.js --fix",
     "test": "jest"
@@ -43,7 +44,7 @@
       "jest": true
     }
   },
-  "repository": "git@github.com:danielgamage/lenticula.git",
+  "repository": "git@github.com:danielgamage/lenti.git",
   "jest": {
     "testEnvironment": "node"
   },
