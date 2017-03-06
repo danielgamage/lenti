@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Daniel Gamage",
+      "authorEmail": "hello@danielgamage.com",
+      "authorUrl": "https://danielgamage.com"
+    }
+  }
+}
