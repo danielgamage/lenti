@@ -57,6 +57,13 @@ The horizontal width (in pixels) of each lens strip.
 **default**: 50
 The height and width of the canvas (in pixels). You **definitely should** match this to the value of your images (which should all be the same size)
 
+## Cross-origin images
+Because Lenti uses canvas to produce this effect, most browsers will be upset if you fetch an image from another origin. Be sure to set `crossorigin="anonymous"`  on your images:
+
+```html
+  <img src="assets/images/1.jpg" alt="Blue Image" crossorigin="anonymous" width="1280" height="720" />
+```
+
 ## License
 
 Apache-2.0 © [Daniel Gamage](https://danielgamage.com)
