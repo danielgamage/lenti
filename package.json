@@ -33,8 +33,8 @@
   },
   "scripts": {
     "prepublish": "nsp check",
-    "watch": "babel --watch src --out-dir lib",
-    "build": "babel src --out-dir lib",
+    "watch": "babel --watch src/index.js --out-file lib/index.js",
+    "build": "babel src/index.js --out-file lib/index.js",
     "pretest": "eslint src/index.js --fix",
     "test": "jest"
   },
