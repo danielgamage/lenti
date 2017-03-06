@@ -51,14 +51,16 @@ class Lenti {
     })
   }
   getImage (image, imageIndex) {
-    this.ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, this.canvasWidth, this.canvas.clientHeight)
-    const currImageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvas.clientHeight)
-    this.imageDataArray[imageIndex] = JSON.parse(JSON.stringify(currImageData))
+    this.ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, this.canvasWidth, this.canvasHeight)
+    const currImageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
+    // slice is much faster than spread ([...]) or json.parse(json.stringify()) at copying, but performs a shallow copy
+    this.imageDataArray[imageIndex] = currImageData.data.slice()
   }
 
   // Handle window resize
   handleSizing () {
-    this.canvasWidth = this.canvas.clientWidth
+    // use offsetWidth bc clientWidth = 0 when resizing
+    this.canvasWidth = this.canvas.offsetWidth
     this.canvasHeight = this.canvasWidth * (this.height / this.width)
     this.canvas.setAttribute(`width`, this.canvasWidth)
     this.canvas.setAttribute(`height`, this.canvasHeight)
@@ -91,18 +93,23 @@ class Lenti {
     // make sure data is loaded before redrawing
     if (this.imageDataArray[0]) {
       let data = this.imageData.data
+      const dataArray = this.imageDataArray
+      const canvasWidth = this.canvasWidth
+      const stripWidth = this.stripWidth
+      const imageCount = this.imageCount
 
-      const addOn = (balance * this.imageCount) - 0.5
+      const addOn = (balance * imageCount) - 0.5
 
       for (let i = 0; i < data.length; i += 4) {
-        const set = (i / 4 % this.canvasWidth % this.stripWidth / this.stripWidth) + addOn
-        const setClamped = Math.floor(Math.min(Math.max(set, 0), this.imageCount - 1))
+        const set = (i / 4 % canvasWidth % stripWidth / stripWidth) + addOn
+        const setClamped = Math.floor(Math.min(Math.max(set, 0), imageCount - 1))
 
-        data[i + 0] = this.imageDataArray[setClamped].data[i + 0] // r
-        data[i + 1] = this.imageDataArray[setClamped].data[i + 1] // g
-        data[i + 2] = this.imageDataArray[setClamped].data[i + 2] // b
-        data[i + 3] = this.imageDataArray[setClamped].data[i + 3] // a
+        data[i + 0] = dataArray[setClamped][i + 0] // r
+        data[i + 1] = dataArray[setClamped][i + 1] // g
+        data[i + 2] = dataArray[setClamped][i + 2] // b
+        data[i + 3] = dataArray[setClamped][i + 3] // a
       }
+
       this.ctx.putImageData(this.imageData, 0, 0, 0, 0, this.canvasWidth, this.canvasHeight)
     }
   }
