@@ -61,7 +61,7 @@ The height and width of the canvas (in pixels). You **definitely should** match 
 Because Lenti uses canvas to produce this effect, most browsers will be upset if you fetch an image from another origin. Be sure to set `crossorigin="anonymous"`  on your images:
 
 ```html
-  <img src="assets/images/1.jpg" alt="Blue Image" crossorigin="anonymous" width="1280" height="720" />
+  <img src="https://flickr.com/images/x/1280/720/1.jpg" alt="Blue Image" crossorigin="anonymous" width="1280" height="720" />
 ```
 
 ## License
