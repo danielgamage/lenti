@@ -1,3 +1,4 @@
+/* global window */
 let Lenti = function (options) {
   let _this = this
 
@@ -32,6 +33,7 @@ let Lenti = function (options) {
       }, false)
       htmlImg.crossOrigin = `Anonymous`
       htmlImg.src = image.src
+      return true
     })
 
     _this.bindEvents()
@@ -62,12 +64,12 @@ let Lenti = function (options) {
   }
 
   // Redraw canvas
-  this.redraw = (balance) => {
+  this.redraw = balance => {
     let data = _this.imageData.data
 
     for (let i = 0; i < data.length; i += 4) {
-      const set = ((((i / 4) % _this.canvasWidth) % _this.stripWidth) / _this.stripWidth) + balance * _this.images.length - 0.5
-      const setClamped = Math.floor(Math.min(Math.max(set, 0), (_this.images.length - 1)))
+      const set = i / 4 % _this.canvasWidth % _this.stripWidth / _this.stripWidth + balance * _this.images.length - 0.5
+      const setClamped = Math.floor(Math.min(Math.max(set, 0), _this.images.length - 1))
 
       data[i + 0] = _this.imageDataArray[setClamped].data[i + 0] // r
       data[i + 1] = _this.imageDataArray[setClamped].data[i + 1] // g
@@ -78,12 +80,12 @@ let Lenti = function (options) {
   }
 
   // Handle mouse events
-  this.handleMouse = (e) => {
+  this.handleMouse = e => {
     _this.redraw(e.offsetX / _this.canvasWidth)
   }
 
   // Handle device accelerometer events
-  this.handleOrientation = (e) => {
+  this.handleOrientation = e => {
     const clamped = Math.max(Math.min(e.gamma, 45), -45)
     const balance = _this.remap(clamped, -45, 45, 0, 1)
     _this.redraw(balance)
@@ -91,7 +93,7 @@ let Lenti = function (options) {
 
   // Map values from one range to another
   this.remap = (value, inLow, inHigh, outLow, outHigh) => {
-    return (outLow + (value - inLow) * (outHigh - outLow) / (inHigh - inLow))
+    return outLow + (value - inLow) * (outHigh - outLow) / (inHigh - inLow)
   }
 }
 
