@@ -35,7 +35,7 @@
     "prepublish": "nsp check",
     "watch": "babel --watch src --out-dir lib",
     "build": "babel src --out-dir lib",
-    "pretest": "eslint **/*.js --fix",
+    "pretest": "eslint src/index.js --fix",
     "test": "jest"
   },
   "eslintConfig": {

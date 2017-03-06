@@ -1,6 +1,6 @@
 /* global window */
 class Lenti {
-  constructor(options) {
+  constructor (options) {
     // Config
     this.container = options.container
     this.accelerometerEvents = options.accelerometerEvents || true
@@ -22,7 +22,7 @@ class Lenti {
   }
 
   // Initialize
-  init() {
+  init () {
     this.images = [...this.container.querySelectorAll(`img`)]
     this.imageDataArray = [...Array(this.images.length).keys()] // empty array w/ same length as this.images
     this.container.innerHTML += `<canvas />`
@@ -36,7 +36,7 @@ class Lenti {
 
     this.images.map((imageEl, imageIndex) => {
       let htmlImg = new window.Image()
-      htmlImg.addEventListener(`load`, function() {
+      htmlImg.addEventListener(`load`, function () {
         this.getImage(imageEl, imageIndex)
       }.bind(this))
       htmlImg.crossOrigin = `Anonymous`
@@ -47,20 +47,20 @@ class Lenti {
     this.bindEvents()
   }
 
-  getImage(image, imageIndex) {
+  getImage (image, imageIndex) {
     this.ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, this.canvasWidth, this.canvas.clientHeight)
     const currImageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvas.clientHeight)
     this.imageDataArray[imageIndex] = JSON.parse(JSON.stringify(currImageData))
   }
 
   // Handle window resize
-  handleResize() {
+  handleResize () {
     this.canvasWidth = this.canvas.clientWidth
     this.canvasHeight = this.canvas.clientHeight
   }
 
   // Event Binding
-  bindEvents() {
+  bindEvents () {
     if (this.mouseEvents) {
       this.canvas.addEventListener(`mousemove`, this.handleMouse)
     }
@@ -71,14 +71,14 @@ class Lenti {
   }
 
   // Event Unbinding
-  destroy() {
+  destroy () {
     this.canvas.addEventListener(`mousemove`, this.handleMouse)
     window.addEventListener(`deviceorientation`, this.handleOrientation)
     window.removeEventListener(`resize`, this.handleResize)
   }
 
   // Redraw canvas
-  redraw(balance) {
+  redraw (balance) {
     // make sure data is loaded before redrawing
     if (this.imageDataArray[0]) {
       let data = this.imageData.data
@@ -97,19 +97,19 @@ class Lenti {
   }
 
   // Handle mouse events
-  handleMouse(e) {
+  handleMouse (e) {
     this.redraw(e.offsetX / this.canvasWidth)
   }
 
   // Handle device accelerometer events
-  handleOrientation(e) {
+  handleOrientation (e) {
     const clamped = Math.max(Math.min(e.gamma, 45), -45)
     const balance = this.remap(clamped, -45, 45, 0, 1)
     this.redraw(balance)
   }
 
   // Map values from one range to another
-  remap(value, inLow, inHigh, outLow, outHigh) {
+  remap (value, inLow, inHigh, outLow, outHigh) {
     return outLow + ((value - inLow) * (outHigh - outLow) / (inHigh - inLow))
   }
 }
