@@ -21,10 +21,15 @@
     "babel-preset-es2015": "^6.22.0",
     "coveralls": "^2.11.15",
     "eslint": "^3.8.1",
+    "eslint-config-standard": "^7.0.0",
     "eslint-config-xo-space": "^0.15.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^2.1.1",
     "jest": "^19.0.2",
     "jest-cli": "^19.0.1",
-    "nsp": "^2.6.2"
+    "nsp": "^2.6.2",
+    "standard": "^9.0.0"
   },
   "scripts": {
     "prepublish": "nsp check",
@@ -33,7 +38,7 @@
     "test": "jest"
   },
   "eslintConfig": {
-    "extends": "xo-space",
+    "extends": "standard",
     "env": {
       "jest": true
     }

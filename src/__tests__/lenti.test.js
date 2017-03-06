@@ -1,8 +1,6 @@
 const assert = require('assert')
-const lenti = require('../index.js')
+const Lenti = require('../index.js')
 
-describe('lenti', function () {
-  it('has a test', function () {
-    assert(false, 'lenti should have a test')
-  })
+test('', () => {
+  expect(Lenti.remap(5, 0, 10, 50, 100)).toBe(75)
 })
