@@ -35,7 +35,7 @@ class Lenti {
   }
 
   // Sample image
-  sampleImages() {
+  sampleImages () {
     this.images.map((imageEl, imageIndex) => {
       if (this.imageDataArray[0]) {
         this.getImage(imageEl, imageIndex)
