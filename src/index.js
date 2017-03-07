@@ -53,8 +53,7 @@ class Lenti {
   getImage (image, imageIndex) {
     this.ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, this.canvasWidth, this.canvasHeight)
     const currImageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
-    // slice is much faster than spread ([...]) or json.parse(json.stringify()) at copying, but performs a shallow copy
-    this.imageDataArray[imageIndex] = currImageData.data.slice()
+    this.imageDataArray[imageIndex] = new Uint32Array(currImageData.data.buffer)
   }
 
   // Handle window resize
@@ -94,6 +93,8 @@ class Lenti {
     // make sure data is loaded before redrawing
     if (this.imageDataArray[0]) {
       let data = this.imageData.data
+      let data32 = new Uint32Array(data.buffer)
+
       const dataArray = this.imageDataArray
       const canvasWidth = this.canvasWidth
       const canvasHeight = this.canvasHeight
@@ -107,11 +108,8 @@ class Lenti {
         const setClamped = Math.floor(Math.min(Math.max(set, 0), imageCount - 1))
 
         for (let y=0; y < canvasHeight; y++) {
-          const pixel = (x + (canvasWidth * y)) * 4
-          data[pixel + 0] = dataArray[setClamped][pixel + 0] // r
-          data[pixel + 1] = dataArray[setClamped][pixel + 1] // g
-          data[pixel + 2] = dataArray[setClamped][pixel + 2] // b
-          data[pixel + 3] = dataArray[setClamped][pixel + 3] // a
+          const pixel = x + (canvasWidth * y)
+          data32[pixel] = dataArray[setClamped][pixel]
         }
       }
 
