@@ -60,7 +60,8 @@ class Lenti {
   // Handle window resize
   handleSizing () {
     // use offsetWidth bc clientWidth = 0 when resizing
-    this.canvasWidth = this.canvas.offsetWidth
+    // multiply by device pixel ratio to convert css pixels → device pixels
+    this.canvasWidth = this.canvas.offsetWidth * window.devicePixelRatio
     this.canvasHeight = this.canvasWidth * (this.height / this.width)
     this.canvas.setAttribute(`width`, this.canvasWidth)
     this.canvas.setAttribute(`height`, this.canvasHeight)
