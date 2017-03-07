@@ -16,6 +16,8 @@ class Lenti {
     this.sampleImages = this.sampleImages.bind(this)
     this.getImage = this.getImage.bind(this)
     this.handleSizing = this.handleSizing.bind(this)
+    this.getBoxPosition = this.getBoxPosition.bind(this)
+    this.checkVisibility = this.checkVisibility.bind(this)
     this.bindEvents = this.bindEvents.bind(this)
     this.destroy = this.destroy.bind(this)
     this.redraw = this.redraw.bind(this)
@@ -34,6 +36,8 @@ class Lenti {
     this.ctx = this.canvas.getContext(`2d`)
     this.handleSizing()
     this.bindEvents()
+    this.getBoxPosition()
+    this.checkVisibility()
   }
 
   // Sample image
@@ -67,6 +71,27 @@ class Lenti {
     // careful on the fire rate here.
     this.sampleImages()
     this.imageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
+    this.getBoxPosition()
+  }
+
+  getBoxPosition () {
+    const boxyRect = this.canvas.getBoundingClientRect()
+    this.box = {
+      top: boxyRect.top + window.pageYOffset
+    }
+  }
+  // Check if canvas is in view
+  checkVisibility () {
+    const vTop = window.pageYOffset
+    const vHeight = window.innerHeight
+    if (vTop + vHeight < this.box.top
+     || this.box.top + this.canvasHeight < vTop) {
+      // viewport doesn't include canvas
+      this.visible = false
+    } else {
+      // viewport includes canvas
+      this.visible = true
+    }
   }
 
   // Event Binding
@@ -77,13 +102,15 @@ class Lenti {
     if (this.accelerometerEvents) {
       window.addEventListener(`deviceorientation`, this.handleOrientation)
     }
+    window.addEventListener(`scroll`, this.checkVisibility)
     window.addEventListener(`resize`, this.handleSizing)
   }
 
   // Event Unbinding
   destroy () {
-    this.canvas.addEventListener(`mousemove`, this.handleMouse)
-    window.addEventListener(`deviceorientation`, this.handleOrientation)
+    this.canvas.removeEventListener(`mousemove`, this.handleMouse)
+    window.removeEventListener(`deviceorientation`, this.handleOrientation)
+    window.removeEventListener(`scroll`, this.checkVisibility)
     window.removeEventListener(`resize`, this.handleSizing)
   }
 
@@ -124,10 +151,11 @@ class Lenti {
 
   // Handle device accelerometer events
   handleOrientation (e) {
-    // TODO: should only handle this if the canvas is in view
-    const clamped = Math.min(Math.max(e.gamma, this.tiltMin), this.tiltMax)
-    const balance = this.remap(clamped, this.tiltMin, this.tiltMax, 1, 0)
-    this.redraw(balance)
+    if (this.visible) {
+      const clamped = Math.min(Math.max(e.gamma, this.tiltMin), this.tiltMax)
+      const balance = this.remap(clamped, this.tiltMin, this.tiltMax, 1, 0)
+      this.redraw(balance)
+    }
   }
 
   // Map values from one range to another
