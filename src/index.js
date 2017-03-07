@@ -96,19 +96,23 @@ class Lenti {
       let data = this.imageData.data
       const dataArray = this.imageDataArray
       const canvasWidth = this.canvasWidth
+      const canvasHeight = this.canvasHeight
       const stripWidth = this.stripWidth
       const imageCount = this.imageCount
 
       const addOn = (balance * imageCount) - 0.5
 
-      for (let i = 0; i < data.length; i += 4) {
-        const set = (i / 4 % canvasWidth % stripWidth / stripWidth) + addOn
+      for (let x=0; x < canvasWidth; x++) {
+        const set = (x % stripWidth / stripWidth) + addOn
         const setClamped = Math.floor(Math.min(Math.max(set, 0), imageCount - 1))
 
-        data[i + 0] = dataArray[setClamped][i + 0] // r
-        data[i + 1] = dataArray[setClamped][i + 1] // g
-        data[i + 2] = dataArray[setClamped][i + 2] // b
-        data[i + 3] = dataArray[setClamped][i + 3] // a
+        for (let y=0; y < canvasHeight; y++) {
+          const pixel = (x + (canvasWidth * y)) * 4
+          data[pixel + 0] = dataArray[setClamped][pixel + 0] // r
+          data[pixel + 1] = dataArray[setClamped][pixel + 1] // g
+          data[pixel + 2] = dataArray[setClamped][pixel + 2] // b
+          data[pixel + 3] = dataArray[setClamped][pixel + 3] // a
+        }
       }
 
       this.ctx.putImageData(this.imageData, 0, 0, 0, 0, this.canvasWidth, this.canvasHeight)
@@ -117,12 +121,14 @@ class Lenti {
 
   // Handle mouse events
   handleMouse (e) {
+    // TODO: should only handle this if the canvas is in view
     const balance = this.remap(e.offsetX / this.canvasWidth, 0, 1, 1, 0)
     this.redraw(balance)
   }
 
   // Handle device accelerometer events
   handleOrientation (e) {
+    // TODO: should only handle this if the canvas is in view
     const clamped = Math.max(Math.min(e.gamma, 45), -45)
     const balance = this.remap(clamped, -45, 45, 1, 0)
     this.redraw(balance)
