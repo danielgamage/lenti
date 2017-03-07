@@ -8,6 +8,8 @@ class Lenti {
     this.stripWidth = options.stripWidth || 16
     this.height = options.height || 50
     this.width = options.width || 50
+    this.tiltMax = options.tiltMax || 45
+    this.tiltMin = options.tiltMin || -45
 
     this.bindEvents = this.bindEvents.bind(this)
     this.init = this.init.bind(this)
@@ -127,8 +129,8 @@ class Lenti {
   // Handle device accelerometer events
   handleOrientation (e) {
     // TODO: should only handle this if the canvas is in view
-    const clamped = Math.max(Math.min(e.gamma, 45), -45)
-    const balance = this.remap(clamped, -45, 45, 1, 0)
+    const clamped = Math.min(Math.max(e.gamma, this.tiltMin), this.tiltMax)
+    const balance = this.remap(clamped, this.tiltMin, this.tiltMax, 1, 0)
     this.redraw(balance)
   }
 
