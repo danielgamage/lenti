@@ -61,7 +61,7 @@ class Lenti {
   handleSizing () {
     // use offsetWidth bc clientWidth = 0 when resizing
     // multiply by device pixel ratio to convert css pixels → device pixels
-    this.canvasWidth = this.canvas.offsetWidth * window.devicePixelRatio
+    this.canvasWidth = Math.floor(this.canvas.offsetWidth * window.devicePixelRatio)
     this.canvasHeight = this.canvasWidth * (this.height / this.width)
     this.canvas.setAttribute(`width`, this.canvasWidth)
     this.canvas.setAttribute(`height`, this.canvasHeight)
@@ -117,13 +117,14 @@ class Lenti {
 
   // Handle mouse events
   handleMouse (e) {
-    this.redraw(e.offsetX / this.canvasWidth)
+    const balance = this.remap(e.offsetX / this.canvasWidth, 0, 1, 1, 0)
+    this.redraw(balance)
   }
 
   // Handle device accelerometer events
   handleOrientation (e) {
     const clamped = Math.max(Math.min(e.gamma, 45), -45)
-    const balance = this.remap(clamped, -45, 45, 0, 1)
+    const balance = this.remap(clamped, -45, 45, 1, 0)
     this.redraw(balance)
   }
 
