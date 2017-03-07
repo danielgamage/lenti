@@ -42,12 +42,9 @@ class Lenti {
       if (this.imageDataArray[0]) {
         this.getImage(imageEl, imageIndex)
       } else {
-        let htmlImg = new window.Image()
-        htmlImg.addEventListener(`load`, function () {
+        imageEl.addEventListener(`load`, function () {
           this.getImage(imageEl, imageIndex)
         }.bind(this))
-        htmlImg.crossOrigin = `Anonymous`
-        htmlImg.src = imageEl.src
         return imageEl
       }
     })
@@ -121,7 +118,6 @@ class Lenti {
 
   // Handle mouse events
   handleMouse (e) {
-    // TODO: should only handle this if the canvas is in view
     const balance = this.remap(e.offsetX / this.canvasWidth, 0, 1, 1, 0)
     this.redraw(balance)
   }
