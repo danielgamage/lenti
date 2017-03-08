@@ -88,8 +88,8 @@ class Lenti {
   checkVisibility () {
     const vTop = window.pageYOffset
     const vHeight = window.innerHeight
-    if (vTop + vHeight < this.box.top
-     || this.box.top + this.canvasHeight < vTop) {
+    if (vTop + vHeight < this.box.top ||
+      this.box.top + this.canvasHeight < vTop) {
       // viewport doesn't include canvas
       this.visible = false
     } else {
@@ -133,11 +133,11 @@ class Lenti {
 
       const addOn = (balance * imageCount) - 0.5
 
-      for (let x=0; x < canvasWidth; x++) {
+      for (let x = 0; x < canvasWidth; x++) {
         const set = (x % stripWidth / stripWidth) + addOn
         const setClamped = Math.floor(Math.min(Math.max(set, 0), imageCount - 1))
 
-        for (let y=0; y < canvasHeight; y++) {
+        for (let y = 0; y < canvasHeight; y++) {
           const pixel = x + (canvasWidth * y)
           data32[pixel] = dataArray[setClamped][pixel]
         }
