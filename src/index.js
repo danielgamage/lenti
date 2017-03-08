@@ -135,11 +135,11 @@ class Lenti {
       const stripWidth = this.stripWidth
       const imageCount = this.imageCount
 
-      const addOn = (balance * imageCount) - 0.5
+      const addOn = (balance * (imageCount - 1))
 
       for (let x = 0; x < canvasWidth; x++) {
         const set = (x % stripWidth / stripWidth) + addOn
-        const setClamped = Math.floor(Math.min(Math.max(set, 0), imageCount - 1))
+        const setClamped = Math.floor(set)
 
         for (let y = 0; y < canvasHeight; y++) {
           const pixel = x + (canvasWidth * y)
