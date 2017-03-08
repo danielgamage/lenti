@@ -1,6 +1,10 @@
 # lenti [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
 > Lenticular image viewer
 
+Lenti is an image viewer that mimicks the effect of lenticular printing. It displays images in a canvas element and binds events for mouse and accelerometer events, so just as you would rotate a card or print with lenticular lenses on it, you can tilt your phone to transition between images.
+
+Lenti will accomodate any number of images in the container (be good to your RAM and don’t go wild, though).
+
 ## Installation
 
 ```sh
@@ -37,6 +41,7 @@ let instances = []
 **Required**
 
 Specifies the HTMLElement (not selector) that contains the images.
+
 #### `accelerometerEvents`
 **default**: true
 
@@ -49,17 +54,20 @@ Turns mouse hover interaction on or off.
 
 #### `stripWidth`
 **default**: 16
+
 The horizontal width (in pixels) of each lens strip.
 
 #### `height` & `width`
 **default**: 50
+
 The height and width of the canvas (in pixels). You **definitely should** match this to the value of your images (which should all be the same size)
 
-#### tiltMax
+#### `tiltMax`
 **default**: 45
-#### tiltMin
+#### `tiltMin`
 **default**: -45
 
+For the accelerometer event listener, define the max and min tiltable angle for interaction.
 
 ## Custom events
 Lenti doesn't make too many assumptions about your environment. You may turn off the default event handlers (see `accelerometerEvents` and `mouseEvents`) and make your own interaction system. Just send a value between 0–1 to your instance at `Lenti.redraw()`.
