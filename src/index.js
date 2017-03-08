@@ -38,6 +38,8 @@ class Lenti {
     this.container.innerHTML += `<canvas />`
     this.canvas = this.container.querySelector(`canvas`)
     this.ctx = this.canvas.getContext(`2d`)
+    this.tempCanvas = document.createElement(`canvas`)
+    this.tempCtx = this.canvas.getContext(`2d`)
     this.handleSizing()
     this.bindEvents()
     this.getBoxPosition()
@@ -58,8 +60,8 @@ class Lenti {
     })
   }
   getImage (image, imageIndex) {
-    this.ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, this.canvasWidth, this.canvasHeight)
-    const currImageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
+    this.tempCtx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, this.canvasWidth, this.canvasHeight)
+    const currImageData = this.tempCtx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
     this.imageDataArray[imageIndex] = new Uint32Array(currImageData.data.buffer)
   }
 
@@ -69,12 +71,14 @@ class Lenti {
     // multiply by device pixel ratio to convert css pixels → device pixels
     this.canvasWidth = Math.floor(this.canvas.offsetWidth * window.devicePixelRatio)
     this.canvasHeight = Math.floor(this.canvasWidth * (this.height / this.width))
-    this.canvas.setAttribute(`width`, this.canvasWidth)
-    this.canvas.setAttribute(`height`, this.canvasHeight)
+    this.canvas.width = this.canvasWidth
+    this.canvas.height = this.canvasHeight
+    this.tempCanvas.width = this.canvasWidth
+    this.tempCanvas.height = this.canvasHeight
     // Resample images
     // careful on the fire rate here.
     this.sampleImages()
-    this.imageData = this.ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
+    this.imageData = this.tempCtx.getImageData(0, 0, this.canvasWidth, this.canvasHeight)
     this.getBoxPosition()
   }
 
