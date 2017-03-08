@@ -3,7 +3,7 @@
 
 Lenti is an image viewer that mimicks the effect of lenticular printing. It displays images in a canvas element and binds events for mouse and accelerometer events, so just as you would rotate a card or print with lenticular lenses on it, you can tilt your phone to transition between images.
 
-Lenti will accomodate any number of images in the container (be good to your RAM and don’t go wild, though).
+**[Demo][demo-page]**
 
 ## Installation
 
@@ -12,6 +12,9 @@ $ npm install --save lenti
 ```
 
 ## Basic Usage
+
+Lenti will accomodate any number of images in the container (be good to your RAM and don’t go wild, though).
+
 ```html
 <div data-lenticular-list="true" >
   <img src="assets/images/1.jpg" alt="Blue Image" width="1280" height="720" />
@@ -113,7 +116,7 @@ let instances = []
 	})
 })
 ```
-After disabling the default mouse event handler, we set up a new event listener (`mousemove`), map the value of `e.offsetX / _this.canvasWidth` to the range 1–0 (just inverting the range here), and send the value to `balanceSpring`, which interpolates the value. We tell `balanceSpring` to send the spring value to our instance method at `Lenti.redraw()` as it updates. Check the [demo page](https://danielgamage.github.io/lenti/) to see this example in use.
+After disabling the default mouse event handler, we set up a new event listener (`mousemove`), map the value of `e.offsetX / _this.canvasWidth` to the range 1–0 (just inverting the range here), and send the value to `balanceSpring`, which interpolates the value. We tell `balanceSpring` to send the spring value to our instance method at `Lenti.redraw()` as it updates. Check the [demo page][demo-page] to see this example in use.
 
 You can imagine that this example does not demonstrate the full flexibility you have here, and that you could, for instance, replace the default gamma-rotation accelerometer event with events for a different axis, use ambient light sensors to change the value, have timed animations driven by any arbitrary event, and so on.
 
@@ -121,7 +124,7 @@ You can imagine that this example does not demonstrate the full flexibility you 
 Because Lenti uses canvas to produce this effect, most browsers will be upset if you fetch an image from another origin. Be sure to set `crossorigin="anonymous"`  on your images:
 
 ```html
-  <img src="https://flickr.com/images/x/1280/720/1.jpg" alt="Blue Image" crossorigin="anonymous" width="1280" height="720" />
+<img src="https://flickr.com/images/x/1280/720/1.jpg" alt="Blue Image" crossorigin="anonymous" width="1280" height="720" />
 ```
 
 ## License
@@ -137,3 +140,4 @@ Apache-2.0 © [Daniel Gamage](https://danielgamage.com)
 [daviddm-url]: https://david-dm.org/danielgamage/lenti
 [coveralls-image]: https://coveralls.io/repos/danielgamage/lenti/badge.svg
 [coveralls-url]: https://coveralls.io/r/danielgamage/lenti
+[demo-page]: https://danielgamage.github.io/lenti/
