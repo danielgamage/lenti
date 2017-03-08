@@ -3,8 +3,12 @@ class Lenti {
   constructor (options) {
     // Config
     this.container = options.container
-    this.accelerometerEvents = options.accelerometerEvents || true
-    this.mouseEvents = options.mouseEvents || true
+    this.accelerometerEvents = (options.accelerometerEvents !== undefined)
+      ? options.accelerometerEvents
+      : true
+    this.mouseEvents = (options.mouseEvents !== undefined)
+      ? options.mouseEvents
+      : true
     this.stripWidth = options.stripWidth || 16
     this.height = options.height || 50
     this.width = options.width || 50
