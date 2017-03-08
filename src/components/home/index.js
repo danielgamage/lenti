@@ -1,6 +1,7 @@
 import { h, Component } from 'preact'
 import style from './style'
 import Lenti from 'lenti'
+import rebound from 'rebound'
 
 export default class Home extends Component {
 	componentDidMount() {
@@ -9,15 +10,34 @@ export default class Home extends Component {
 		// convert → array & loop through
 		;[...lenticulars].map((el, i) => {
 			const image = el.querySelector('img')
-		  // store instance in array for further manipulation
-		  instances[i] = new Lenti({
+			// store instance in array for further manipulation
+			instances[i] = new Lenti({
 				container: el,
 				width: image.width,
 				height: image.height,
-				stripWidth: el.getAttribute('data-strip-width')
+				stripWidth: el.getAttribute('data-strip-width'),
+				mouseEvents: false
 			})
-		  // initialize instance
-		  instances[i].init()
+			let _this = instances[i]
+
+			// set up spring
+			const springSystem = new rebound.SpringSystem();
+			const springConfig = [40, 9] // tension, friction
+			const balanceSpring = springSystem.createSpring(...springConfig);
+			balanceSpring.addListener({ onSpringUpdate: function(balanceSpring) {
+				_this.redraw(balanceSpring.getCurrentValue())
+			}})
+			// initialize instance
+			_this.init()
+
+			// set initial value
+			balanceSpring.setEndValue(1)
+
+			// bind mouse events
+			_this.canvas.addEventListener('mousemove', (e) => {
+				const balance = _this.remap(e.offsetX / _this.canvasWidth, 0, 1, 1, 0)
+				balanceSpring.setEndValue(balance)
+			})
 		})
 	}
 	render() {
@@ -46,6 +66,46 @@ export default class Home extends Component {
 			    </div>
 				</div>
 				<p>Lenti will accomodate any number of images in the container (be good to your RAM and don&#8217;t go wild, though).</p>
+				<p>This page demonstrates how you might tap into the event system and use Lenti with another library like <a href="https://github.com/facebook/rebound-js">Rebound</a> to get smoother interaction.</p>
+				<pre><code>{`
+import Lenti from 'lenti'
+import rebound from 'rebound'
+
+let lenticulars = document.querySelectorAll('[data-lenticular-list]')
+let instances = []
+// convert → array & loop through
+;[...lenticulars].map((el, i) => {
+	const image = el.querySelector('img')
+	// store instance in array for further manipulation
+	instances[i] = new Lenti({
+		container: el,
+		width: image.width,
+		height: image.height,
+		stripWidth: el.getAttribute('data-strip-width'),
+		mouseEvents: false
+	})
+	let _this = instances[i]
+
+	// set up spring
+	const springSystem = new rebound.SpringSystem();
+	const springConfig = [40, 9] // tension, friction
+	const balanceSpring = springSystem.createSpring(...springConfig);
+	balanceSpring.addListener({ onSpringUpdate: function(balanceSpring) {
+		_this.redraw(balanceSpring.getCurrentValue())
+	}})
+	// initialize instance
+	_this.init()
+
+	// set initial value
+	balanceSpring.setEndValue(1)
+
+	// bind mouse events
+	_this.canvas.addEventListener('mousemove', (e) => {
+		const balance = _this.remap(e.offsetX / _this.canvasWidth, 0, 1, 1, 0)
+		balanceSpring.setEndValue(balance)
+	})
+})
+				`}</code></pre>
 			</div>
 		);
 	}
