@@ -15,7 +15,6 @@ class Lenti {
     this.tiltMax = options.tiltMax || 45
     this.tiltMin = options.tiltMin || -45
 
-    this.bindEvents = this.bindEvents.bind(this)
     this.init = this.init.bind(this)
     this.sampleImages = this.sampleImages.bind(this)
     this.getImage = this.getImage.bind(this)
