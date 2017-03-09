@@ -36,7 +36,7 @@
     "watch": "babel --watch src/index.js --out-file lib/index.js",
     "build": "babel src/index.js --out-file lib/index.js",
     "pretest": "eslint src/index.js --fix",
-    "test": "jest"
+    "test": "jest --watch"
   },
   "eslintConfig": {
     "extends": "standard",
