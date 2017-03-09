@@ -140,10 +140,12 @@ class Lenti {
       for (let x = 0; x < canvasWidth; x++) {
         const set = (x % stripWidth / stripWidth) + addOn
         const setClamped = Math.floor(set)
+        const offset = (x % stripWidth === 0 || x % stripWidth === stripWidth) ? 1 : 0
 
         for (let y = 0; y < canvasHeight; y++) {
           const pixel = x + (canvasWidth * y)
-          data32[pixel] = dataArray[setClamped][pixel]
+          // data32[pixel] = dataArray[setClamped][pixel]
+          data32[pixel] = dataArray[setClamped][Math.max((pixel + (offset * canvasWidth)), 0)]
         }
       }
 
