@@ -72,6 +72,23 @@ The height and width of the canvas (in pixels). You **definitely should** match 
 
 For the accelerometer event listener, define the max and min tiltable angle for interaction.
 
+## Instance Methods
+#### `Lenti.init()`
+Runs setup functions.
+#### `Lenti.bindEvents()`
+#### `Lenti.destroy()`
+Binds (`bindEvents`) or unbinds (`destroy`) events.
+#### `Lenti.handleSizing()`
+Measures the sizing of the box for further calculations. By default the event bindings will call this on resize. If you are resizing a container manually, you should probably fire this.
+#### `Lenti.getBoxPosition()`
+#### `Lenti.checkVisibility()`
+This
+#### `Lenti.redraw(balance)`
+Refreshes the viewer for the given `balance`, where `balance` is a float from `0–1` that represents the position in the image sequence. A value of 0 will show the first image, and a value of 1 will show the last. See [custom events](#custom-events) for an example of this.
+#### `Lenti.remap(value, inLow, inHigh, outLow, outHigh)`
+Helper function to map values from one range to another. You'll likely use this to map values to the range `0–1` for `Lenti.redraw()`.
+
+
 ## Custom events
 Lenti doesn't make too many assumptions about your environment. You may turn off the default event handlers (see `accelerometerEvents` and `mouseEvents`) and make your own interaction system. Just send a value between 0–1 to your instance at `Lenti.redraw()`.
 
