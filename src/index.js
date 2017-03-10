@@ -38,7 +38,8 @@ class Lenti {
     this.canvas = this.container.querySelector(`canvas`)
     this.ctx = this.canvas.getContext(`2d`)
     this.tempCanvas = document.createElement(`canvas`)
-    this.tempCtx = this.canvas.getContext(`2d`)
+    this.tempCtx = this.tempCanvas.getContext(`2d`)
+
     this.handleSizing()
     this.bindEvents()
     this.getBoxPosition()
