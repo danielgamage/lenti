@@ -49,13 +49,12 @@ class Lenti {
   // Sample image
   sampleImages () {
     this.images.map((imageEl, imageIndex) => {
-      if (this.imageDataArray[0]) {
+      if (imageEl.complete) {
         this.getImage(imageEl, imageIndex)
       } else {
         imageEl.addEventListener(`load`, function () {
           this.getImage(imageEl, imageIndex)
         }.bind(this))
-        return imageEl
       }
     })
   }
