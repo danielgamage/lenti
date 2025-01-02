@@ -1,1 +1,7 @@
 src/
+images/
+node_modules/
+coverage/
+.editorconfig
+.gitignore
+tsconfig.json

@@ -1,0 +1,175 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<header class="wrapper">
+  <h1>Lenti</h1>
+  <a href="https://github.com/danielgamage/lenti" target="_blank" title="Source on GitHub">
+    <img src="./images/git.svg" alt="">
+  </a>
+</header>
+
+<div class="wrapper">
+  <div data-lenticular-list="true">
+    <img src="./images/sample_a_1.png" alt="Blue Image" width="1280" height="720" loading="lazy" />
+    <img src="./images/sample_a_2.png" alt="Blue Image" width="1280" height="720" loading="lazy" />
+    <img src="./images/sample_a_3.png" alt="Blue Image" width="1280" height="720" loading="lazy" />
+    <img src="./images/sample_a_4.png" alt="Blue Image" width="1280" height="720" loading="lazy" />
+    <img src="./images/sample_a_5.png" alt="Blue Image" width="1280" height="720" loading="lazy" />
+  </div>
+</div>
+
+<div class="inputs wrapper">
+  <div class="input">
+    <label>
+    stripWidth
+    <input
+      type="number"
+      data-key="stripWidth"
+      min="1"
+      max="100"
+      value="1"
+      step="1"
+    />
+  </label>
+  <span class="suffix">px</span>
+  </div>
+  <div class="input">
+    <label>
+    transition
+    <input
+      type="number"
+      data-key="transition"
+      min="0"
+      max="1000"
+      value="0.5"
+      step=".01"
+    />
+  </label>
+  <span class="suffix">&times;100%</span>
+  </div>
+  <div class="input">
+    <label>
+    lensDarkening
+    <input
+      type="number"
+      data-key="lensDarkening"
+      min="0"
+      max="1"
+      value="0.5"
+      step=".01"
+    />
+  </label>
+  <span class="suffix">&times;100%</span>
+  </div>
+  <div class="input">
+    <label>
+    lensDistortion
+    <input
+      type="number"
+      data-key="lensDistortion"
+      min="0"
+      max="1"
+      value="0.5"
+      step=".01"
+    />
+  </label>
+  <span class="suffix">&times;100%</span>
+  </div>
+</div>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: "Tahoma";
+    color-scheme: dark;
+    background: #111111;
+    color: #eeeeee;
+    padding: 0 1rem;
+  }
+  .wrapper {
+    position: relative;
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 1rem 0;
+  }
+  canvas {
+    width: 100%;
+    height: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  [data-lenticular-list] img {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  canvas {
+    /* background: red; */
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    img {
+      display: inline-block;
+      width: 2rem;
+    }
+  }
+  h1 {
+    margin-block: 0;
+    display: inline-block;
+  }
+  .inputs {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1rem;
+    justify-content: end;
+  }
+  .input {
+    font-size: 0.8rem;
+  }
+  label {
+    font-weight: 500;
+  }
+  input {
+    width: 3.5rem;
+    padding: 0.5rem;
+    border: 1px solid #333;
+    font: inherit;
+    border-radius: 4px;
+  }
+  .suffix {
+    color: #999;
+  }
+</style>
+<script type="module">
+  import Lenti, {bindAccelerometerXY, bindMouseXY} from "./src/index.ts"
+
+  let lenti
+  window.addEventListener("load", () => {
+    const container = document.querySelector("[data-lenticular-list]")
+    const canvas = document.createElement("canvas")
+    container.appendChild(canvas)
+    lenti = new Lenti({
+      container,
+      canvas,
+      eventRoot: window,
+      images: Array.from(container.querySelectorAll("img")),
+      uiAdapters: [bindMouseXY({eventRoot: window}), bindAccelerometerXY()]
+    })
+
+    console.log(lenti)
+    document
+      .querySelectorAll("input[type=number]").forEach(input => {
+        const key = input.getAttribute("data-key")
+        input.value = lenti.inputs[key]
+        input.addEventListener("input", (e) => {
+          lenti.update({[key]: parseFloat(e.target.value)})
+        })
+      })
+  })
+</script>

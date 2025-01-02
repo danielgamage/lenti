@@ -1,8 +1,9 @@
 {
   "name": "lenti",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Lenticular image viewer",
   "homepage": "https://github.com/danielgamage/lenti",
+  "type": "module",
   "author": {
     "name": "Daniel Gamage",
     "email": "hello@danielgamage.com",
@@ -17,37 +18,30 @@
     "image viewer"
   ],
   "devDependencies": {
+    "@webgpu/types": "^0.1.52",
     "babel-cli": "^6.23.0",
     "babel-preset-es2015": "^6.22.0",
     "coveralls": "^2.11.15",
     "eslint": "^3.8.1",
-    "eslint-config-standard": "^7.0.0",
-    "eslint-config-xo-space": "^0.15.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^2.1.1",
     "jest": "^19.0.2",
     "jest-cli": "^19.0.1",
-    "nsp": "^2.6.2",
-    "standard": "^9.0.0"
+    "standard": "^9.0.0",
+    "typescript": "^5.7.3"
   },
   "scripts": {
-    "prepublish": "nsp check",
-    "watch": "babel --watch src/index.js --out-file lib/index.js",
-    "build": "babel src/index.js --out-file lib/index.js",
-    "pretest": "eslint src/index.js --fix",
+    "build": "tsc",
+    "demo:dev": "vite",
+    "demo:build": "vite build",
     "test-dev": "jest --watch",
     "test": "jest --coverage"
-  },
-  "eslintConfig": {
-    "extends": "standard",
-    "env": {
-      "jest": true
-    }
   },
   "repository": "git@github.com:danielgamage/lenti.git",
   "jest": {
     "testEnvironment": "node"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "dependencies": {
+    "vite": "^6.0.6",
+    "webgpu-utils": "^0.14.2"
+  }
 }
