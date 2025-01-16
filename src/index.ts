@@ -118,7 +118,7 @@ export const bindMouseXY = (options: {eventRoot?: HTMLElement | Window | Documen
  * @todo Add better gyro support
  * @todo MSAA instead of just rendering higher resolutions
 */
-class Lenti {
+export class Lenti {
   /** GPU device */
   #device?: GPUDevice = undefined
   /** The output (rendered) canvas */
