@@ -398,6 +398,11 @@ export class Lenti {
     // Create a texture view for each image
     await Promise.all(
       this.images.map(async (img, i) => {
+        if (img instanceof HTMLImageElement && !img.complete) {
+          await new Promise((resolve) => {
+            img.onload = resolve
+          })
+        }
         const canvas = document.createElement("canvas")
         const ctx = canvas.getContext("2d")
         const imageDimensions = {
