@@ -11,6 +11,16 @@ Lenti is an image viewer that mimicks the effect of lenticular printing. It disp
 $ npm install --save lenti
 ```
 
+## Browser Support
+
+<picture>
+<source type="image/webp" srcset="https://caniuse.bitsofco.de/image/webgpu.webp">
+<source type="image/png" srcset="https://caniuse.bitsofco.de/image/webgpu.png">
+<img src="https://caniuse.bitsofco.de/image/webgpu.jpg" alt="Data on support for the webgpu feature across the major browsers from caniuse.com">
+</picture>
+
+_Thanks to Ire for their [Can I Use Embed](https://caniuse.bitsofco.de/#how-to-use)_
+
 ## Basic Usage
 
 Lenti will accomodate any number of images in the container (be good to your RAM and don’t go wild, though).
