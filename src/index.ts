@@ -32,47 +32,89 @@ export type NormalizedNumber = number
 export type UIAdapter = (lentiInstance: Lenti) => void;
 export type UIAdapterFactory = (options?: any) => UIAdapter;
 
+var degtorad = Math.PI / 180; // Degree-to-Radian conversion
+/** https://www.w3.org/TR/orientation-event/ */
+function getRotationMatrix( alpha, beta, gamma ) {
+  var _x = beta  ? beta  * degtorad : 0; // beta value
+  var _y = gamma ? gamma * degtorad : 0; // gamma value
+  var _z = alpha ? alpha * degtorad : 0; // alpha value
+  var cX = Math.cos( _x );
+  var cY = Math.cos( _y );
+  var cZ = Math.cos( _z );
+  var sX = Math.sin( _x );
+  var sY = Math.sin( _y );
+  var sZ = Math.sin( _z );
+  //
+  // ZXY rotation matrix construction.
+  //
+  var m11 = cZ * cY - sZ * sX * sY;
+  var m12 = - cX * sZ;
+  var m13 = cY * sZ * sX + cZ * sY;
+
+  var m21 = cY * sZ + cZ * sX * sY;
+  var m22 = cZ * cX;
+  var m23 = sZ * sY - cZ * cY * sX;
+
+  var m31 = - cX * sY;
+  var m32 = sX;
+  var m33 = cX * cY;
+
+  return [
+    m11,    m12,    m13,
+    m21,    m22,    m23,
+    m31,    m32,    m33
+  ];
+};
+
 export const clamp = (value: number, min: number, max: number) =>  Math.min(Math.max(value, min), max)
 export const remap = (value: number, domain: [number, number], range: [number, number]) =>  range[0] + (value - domain[0]) * (range[1] - range[0]) / (domain[1] - domain[0])
 
-export const bindAccelerometerXY = (options: {
+/** Using device  */
+export const bindGyroscopeXY = (options: {
   /** changes x values */
-  gammaBounds: [number, number],
+  xBounds: [number, number],
   /** changes y values */
-  betaBounds: [number, number],
+  yBounds: [number, number],
   /** when the deviceorientation listener is initiated, measure values against the start */
-  relative?: boolean
-}= {gammaBounds: [-45, 45], betaBounds: [0,90]}) => {
+  relative?: boolean,
+  /** Some browsers require user gesture before requesting permission. This is the element that will require click if so. */
+  userGestureElement?: HTMLElement,
+} = {xBounds: [-45, 45], yBounds: [0,90]}) => {
   const visible = true
   return (lentiInstance: Lenti) => {
     const handleOrientation = (e: DeviceOrientationEvent) => {
-      if (visible && lentiInstance.uniforms && e.gamma && e.beta) {
+      if (visible && lentiInstance.uniforms) {
+        const matrix = getRotationMatrix(e.alpha, e.beta, e.gamma);
         const viewX = clamp(
-          remap(e.gamma, options.gammaBounds, [1, 0]),
+          remap(matrix[2], [options.xBounds[0] / 90, options.xBounds[1] / 90], [0, 1]),
           0, 1
-        )
+        );
         const viewY = clamp(
-          remap(e.beta, options.betaBounds, [0, 1]),
+          remap(matrix[7], [options.yBounds[0] / 90, options.yBounds[1] / 90], [0, 1]),
           0, 1
-        )
+        );
         lentiInstance.inputs.viewX = viewX
         lentiInstance.inputs.viewY = viewY
         lentiInstance.render()
       }
     }
-    lentiInstance.canvas?.addEventListener('click', (e) => {
-      if ("requestPermission" in DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") {
-        DeviceOrientationEvent.requestPermission()
-          .then((response) => {
-            if (response === 'granted') {
-              window.addEventListener('deviceorientation', handleOrientation);
-            }
-          })
-          .catch(console.error);
-      } else {
-        window.addEventListener('deviceorientation', handleOrientation);
-      }
-    });
+
+    const userGestureBindingElement = options.userGestureElement ?? lentiInstance.canvas
+    if ("requestPermission" in DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") {
+      userGestureBindingElement?.addEventListener('click', (e) => {
+        if ("requestPermission" in DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") {
+          DeviceOrientationEvent.requestPermission()
+            .then((response) => {
+              if (response === 'granted') {
+                window.addEventListener('deviceorientation', handleOrientation);
+              }
+            })
+            .catch(console.error);
+        }
+      });
+    } else {
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
   }
 }
 
@@ -128,7 +170,7 @@ export class Lenti {
   /** WebGPU shader uniforms */
   uniforms: StructuredView | null = null
   /** UI adapters connect user input to the shader settings, custom adapters can be made  */
-  uiAdapters: UIAdapter[] = [bindMouseXY(), bindAccelerometerXY()]
+  uiAdapters: UIAdapter[] = [bindMouseXY(), bindGyroscopeXY()]
 
   /** Watches canvas visibility */
   #observer: IntersectionObserver;
@@ -337,6 +379,10 @@ export class Lenti {
   }
 
   async init() {
+    if (!navigator.gpu) {
+      this.error(new Error("Browser must support WebGPU and page must be served in a secure context. See https://caniuse.com/webgpu for more information."))
+      return
+    }
     const adapter = await navigator.gpu?.requestAdapter()
     this.#device = await adapter?.requestDevice()
     if (!this.#device) {
@@ -532,6 +578,8 @@ export class Lenti {
       transitionAttenuator: this.inputs.transition,
       lensDistortionAttenuator: this.inputs.lensDistortion,
     })
+    console.log({isVisible: this.isVisible, viewX: this.inputs.viewX, viewY: this.inputs.viewY})
+
     this.#device.queue.writeBuffer(
       this.#uniformBuffer,
       0,

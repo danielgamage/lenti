@@ -147,7 +147,7 @@
   }
 </style>
 <script type="module">
-  import {Lenti, bindAccelerometerXY, bindMouseXY} from "./src/index.ts"
+  import {Lenti, bindGyroscopeXY, bindMouseXY} from "./src/index.ts"
 
   let lenti
   window.addEventListener("load", () => {
@@ -159,7 +159,7 @@
       canvas,
       eventRoot: window,
       images: Array.from(container.querySelectorAll("img")),
-      uiAdapters: [bindMouseXY({eventRoot: window}), bindAccelerometerXY()]
+      uiAdapters: [bindMouseXY({eventRoot: window}), bindGyroscopeXY()]
     })
 
     console.log(lenti)
