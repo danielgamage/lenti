@@ -1,3 +1,7 @@
+**lenti**
+
+***
+
 # lenti [![NPM version][npm-image]][npm-url]
 
 Lenti is an image viewer that mimicks the effect of lenticular printing.
@@ -57,7 +61,6 @@ _Thanks to Ire for their [Can IUse Embed](https://caniuse.bitsofco.de/#how-to-us
 <!-- INSERT GENERATED DOCS START -->
 
 <!-- INSERT GENERATED DOCS END -->
-
 
 [npm-image]: https://badge.fury.io/js/lenti.svg
 [npm-url]: https://npmjs.org/package/lenti

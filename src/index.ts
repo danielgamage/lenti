@@ -1,75 +1,39 @@
 import { makeShaderDataDefinitions, makeStructuredView, StructuredView } from "webgpu-utils"
 /**
- * Lenti is an image viewer that mimicks the effect of lenticular printing.
- * It displays images in a canvas element and binds events for mouse and accelerometer events,
- * so just as you would rotate a card or print with lenticular lenses on it, you can tilt your phone to transition between images.
- *
- * ## Installation
- * ```sh
- * npm install --save lenti
- * ```
- *
- * ## Basic Usage
- * Lenti will accomodate any number of images in the container (be good to your RAM and don’t go wild, though).
- * ```js
- * import Lenti from 'lenti'
- *
- * let lenticulars = document.querySelectorAll('[data-lenticular-list]')
- * let instances = []
- * // convert → array & loop through
- * ;[...lenticulars].map((el, i) => {
- *   // store instance in array for further manipulation
- *   instances[i] = new Lenti({container: el, width: 1280, height: 720})
- *   // initialize instance
- *   instances[i].init()
- * })
- * ```
- *
+ * Lenti
  */
 
 /** A number in the range [0, 1] */
 export type NormalizedNumber = number
+/**
+ * UI Adapaters listen for events on a page and can access Lenti properties throughout the instance lifecycle.
+ * UIAdapters expect a Lenti instance to be passed to them, and can be used to bind user input to shader settings.
+ * In practive, this can be as simple as:
+ * ```ts
+ * // Sets the lensDarkening based on the amount of daylight when the page loads
+ * const bindDaylightFactory = (options: {daylight: number}) => {
+ *   return function bindDaylight(lentiInstance: Lenti) => {
+ *     lentiInstance.inputs.lensDarkening = 1 - options.daylight
+ *   }
+ * }
+ *
+ * new Lenti({uiAdapters: [bindDaylightFactory({daylight: 0.5})]})
+ * ```
+*/
 export type UIAdapter = (lentiInstance: Lenti) => void;
+/** UIAdapterFactory is an initializing function that is passed options for the UIAdapater it contains. */
 export type UIAdapterFactory = (options?: any) => UIAdapter;
 
-var degtorad = Math.PI / 180; // Degree-to-Radian conversion
-/** https://www.w3.org/TR/orientation-event/ */
-function getRotationMatrix( alpha, beta, gamma ) {
-  var _x = beta  ? beta  * degtorad : 0; // beta value
-  var _y = gamma ? gamma * degtorad : 0; // gamma value
-  var _z = alpha ? alpha * degtorad : 0; // alpha value
-  var cX = Math.cos( _x );
-  var cY = Math.cos( _y );
-  var cZ = Math.cos( _z );
-  var sX = Math.sin( _x );
-  var sY = Math.sin( _y );
-  var sZ = Math.sin( _z );
-  //
-  // ZXY rotation matrix construction.
-  //
-  var m11 = cZ * cY - sZ * sX * sY;
-  var m12 = - cX * sZ;
-  var m13 = cY * sZ * sX + cZ * sY;
-
-  var m21 = cY * sZ + cZ * sX * sY;
-  var m22 = cZ * cX;
-  var m23 = sZ * sY - cZ * cY * sX;
-
-  var m31 = - cX * sY;
-  var m32 = sX;
-  var m33 = cX * cY;
-
-  return [
-    m11,    m12,    m13,
-    m21,    m22,    m23,
-    m31,    m32,    m33
-  ];
-};
-
+/** Helper */
 export const clamp = (value: number, min: number, max: number) =>  Math.min(Math.max(value, min), max)
+
+/** Helper */
 export const remap = (value: number, domain: [number, number], range: [number, number]) =>  range[0] + (value - domain[0]) * (range[1] - range[0]) / (domain[1] - domain[0])
 
-/** Using device  */
+/**
+ * Drives viewX/viewY based on the device viewing angle
+ * @group UI Adapters
+ */
 export const bindGyroscopeXY = (options: {
   /** changes x values */
   xBounds: [number, number],
@@ -80,23 +44,53 @@ export const bindGyroscopeXY = (options: {
   /** Some browsers require user gesture before requesting permission. This is the element that will require click if so. */
   userGestureElement?: HTMLElement,
 } = {xBounds: [-45, 45], yBounds: [0,90]}) => {
-  const visible = true
+  const degtorad = Math.PI / 180; // Degree-to-Radian conversion
+  /** https://www.w3.org/TR/orientation-event/ */
+  const getRotationMatrix = ( alpha, beta, gamma ) => {
+    var _x = beta  ? beta  * degtorad : 0; // beta value
+    var _y = gamma ? gamma * degtorad : 0; // gamma value
+    var _z = alpha ? alpha * degtorad : 0; // alpha value
+    var cX = Math.cos( _x );
+    var cY = Math.cos( _y );
+    var cZ = Math.cos( _z );
+    var sX = Math.sin( _x );
+    var sY = Math.sin( _y );
+    var sZ = Math.sin( _z );
+    //
+    // ZXY rotation matrix construction.
+    //
+    var m11 = cZ * cY - sZ * sX * sY;
+    var m12 = - cX * sZ;
+    var m13 = cY * sZ * sX + cZ * sY;
+
+    var m21 = cY * sZ + cZ * sX * sY;
+    var m22 = cZ * cX;
+    var m23 = sZ * sY - cZ * cY * sX;
+
+    var m31 = - cX * sY;
+    var m32 = sX;
+    var m33 = cX * cY;
+
+    return [
+      m11,    m12,    m13,
+      m21,    m22,    m23,
+      m31,    m32,    m33
+    ];
+  };
   return (lentiInstance: Lenti) => {
     const handleOrientation = (e: DeviceOrientationEvent) => {
-      if (visible && lentiInstance.uniforms) {
-        const matrix = getRotationMatrix(e.alpha, e.beta, e.gamma);
-        const viewX = clamp(
-          remap(matrix[2], [options.xBounds[0] / 90, options.xBounds[1] / 90], [0, 1]),
-          0, 1
-        );
-        const viewY = clamp(
-          remap(matrix[7], [options.yBounds[0] / 90, options.yBounds[1] / 90], [0, 1]),
-          0, 1
-        );
-        lentiInstance.inputs.viewX = viewX
-        lentiInstance.inputs.viewY = viewY
-        lentiInstance.render()
-      }
+      const matrix = getRotationMatrix(e.alpha, e.beta, e.gamma);
+      const viewX = clamp(
+        remap(matrix[2], [options.xBounds[0] / 90, options.xBounds[1] / 90], [0, 1]),
+        0, 1
+      );
+      const viewY = clamp(
+        remap(matrix[7], [options.yBounds[0] / 90, options.yBounds[1] / 90], [0, 1]),
+        0, 1
+      );
+      lentiInstance.inputs.viewX = viewX
+      lentiInstance.inputs.viewY = viewY
+      lentiInstance.render()
     }
 
     const userGestureBindingElement = options.userGestureElement ?? lentiInstance.canvas
@@ -118,6 +112,10 @@ export const bindGyroscopeXY = (options: {
   }
 }
 
+/**
+ * Drives viewX/viewY based on the mouse position on the element, in the browser window, or in another element (like a touchstrip element)
+ * @group UI Adapters
+ */
 export const bindMouseXY = (options: {eventRoot?: HTMLElement | Window | Document | null } = {}) => {
   return (lentiInstance: Lenti) => {
     const root = options.eventRoot ?? lentiInstance.canvas
@@ -125,12 +123,8 @@ export const bindMouseXY = (options: {eventRoot?: HTMLElement | Window | Documen
       lentiInstance.error(new Error("No event root element found"))
       return
     }
-    if (!lentiInstance.uniforms) {
-      lentiInstance.error(new Error("uniforms not initialized"))
-      return
-    }
     const mouseHandler = (event) => {
-      if (lentiInstance.canvas && lentiInstance.uniforms) {
+      if (lentiInstance.canvas) {
         const rect = lentiInstance.canvas.getBoundingClientRect()
         const rawX = (event.clientX - rect.left) / rect.width
         const deadzone = 0.01 // 10% deadzone on each side
@@ -168,13 +162,13 @@ export class Lenti {
   /** WebGPU context */
   #context: GPUCanvasContext | null = null
   /** WebGPU shader uniforms */
-  uniforms: StructuredView | null = null
+  #uniforms: StructuredView | null = null
   /** UI adapters connect user input to the shader settings, custom adapters can be made  */
   uiAdapters: UIAdapter[] = [bindMouseXY(), bindGyroscopeXY()]
 
   /** Watches canvas visibility */
   #observer: IntersectionObserver;
-  /** Whether the canvas is visible */
+  /** Whether the canvas is visible in the viewport */
   isVisible = false;
 
   /** Device pixel ratio */
@@ -201,7 +195,20 @@ export class Lenti {
     addressModeV: "mirror-repeat",
     magFilter: "linear",
   }
-  inputs = {
+  inputs: {
+    /** Image-space width of the strip placed in an interlaced array under the lenticule */
+    stripWidth: number,
+    /** [0: Leftmost image, 1: Rightmost image] */
+    viewX: NormalizedNumber,
+    /** [0: Top distortion, 1: Bottom distortion] */
+    viewY: NormalizedNumber,
+    /** Amount of darkening to apply near the virtual off-axis parts of the lenticule */
+    lensDarkening: NormalizedNumber,
+    /** Amount of virtual warping to apply to the transition from left–right */
+    transition: NormalizedNumber,
+    /** Amount of y-axis distortion applied to the lenticule simulate vertical off-axis viewing */
+    lensDistortion: NormalizedNumber
+  } = {
     stripWidth: 4,
     viewX: 0,
     viewY: 0,
@@ -413,17 +420,19 @@ export class Lenti {
 
     const defs = makeShaderDataDefinitions(this.#shaderSource)
     if (defs.uniforms !== undefined) {
-      this.uniforms = makeStructuredView(defs.uniforms.customUniforms)
+      this.#uniforms = makeStructuredView(defs.uniforms.customUniforms)
+      console.log(this.#uniforms, !this.#uniforms)
     }
 
-    if (!this.uniforms) {
+    if (!this.#uniforms) {
+      console.log("this c")
       this.error(new Error("Uniforms not initialized"))
       return
     }
 
     this.#uniformBuffer = this.#device.createBuffer({
       label: "Primary uniform buffer",
-      size: this.uniforms.arrayBuffer.byteLength,
+      size: this.#uniforms.arrayBuffer.byteLength,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     })
 
@@ -499,7 +508,7 @@ export class Lenti {
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         if (entry.target instanceof HTMLCanvasElement) {
-          if (this.#device && this.uniforms) {
+          if (this.#device && this.#uniforms) {
             const canvas = entry.target
             const width = entry.contentBoxSize[0].inlineSize
             const height = canvas.width / this.imageAspectRatio
@@ -509,7 +518,7 @@ export class Lenti {
             )
             canvas.height = height
 
-            this.uniforms.set({ outputWidth: width / this.#dpr, outputHeight: height / this.#dpr })
+            this.#uniforms.set({ outputWidth: width / this.#dpr, outputHeight: height / this.#dpr })
 
             this.render()
           }
@@ -527,7 +536,8 @@ export class Lenti {
       this.error(new Error("Device not initialized"))
       return
     }
-    if (!this.uniforms) {
+    if (!this.#uniforms) {
+      console.log("this a")
       this.error(new Error("Uniforms not initialized"))
       return
     }
@@ -550,7 +560,7 @@ export class Lenti {
       { width: imageData.width, height: imageData.height }
     );
 
-    this.uniforms.set({ width: imageData.width, height: imageData.height })
+    this.#uniforms.set({ width: imageData.width, height: imageData.height })
 
     return texture;
   }
@@ -565,11 +575,11 @@ export class Lenti {
   }
 
   render = () => {
-    if (!this.isVisible || !this.#device || !this.uniforms || !this.#uniformBuffer || !this.#pipeline || !this.#context) {
+    if (!this.isVisible || !this.#device || !this.#uniforms || !this.#uniformBuffer || !this.#pipeline || !this.#context) {
       return
     }
 
-    this.uniforms.set({
+    this.#uniforms.set({
       viewX: this.inputs.viewX,
       viewY: this.inputs.viewY,
       imageCount: this.images.length,
@@ -578,12 +588,11 @@ export class Lenti {
       transitionAttenuator: this.inputs.transition,
       lensDistortionAttenuator: this.inputs.lensDistortion,
     })
-    console.log({isVisible: this.isVisible, viewX: this.inputs.viewX, viewY: this.inputs.viewY})
 
     this.#device.queue.writeBuffer(
       this.#uniformBuffer,
       0,
-      this.uniforms.arrayBuffer
+      this.#uniforms.arrayBuffer
     )
 
     const renderPassDescriptor: GPURenderPassDescriptor = {

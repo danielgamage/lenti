@@ -1,0 +1,13 @@
+{
+  "plugin": ["typedoc-plugin-markdown"],
+  "out": "./docs",
+  "skipErrorChecking": true,
+  "membersWithOwnFile": [],
+  "flattenOutputFiles": true,
+  "typeDeclarationFormat": "table",
+  "parametersFormat": "list",
+  "typeDeclarationVisibility": "compact",
+  "expandParameters": true,
+  "classPropertiesFormat": "table",
+  "expandObjects": true,
+}
