@@ -6,6 +6,7 @@
     "target": "ESNext",
     "rootDir": "src",
     "outDir": "lib",
+    "allowImportingTsExtensions": true,
     "declaration": true,
   }
 }

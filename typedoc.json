@@ -1,23 +1,26 @@
 {
   "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-dt-links", "typedoc-plugin-mdn-links"],
   "out": "./docs",
-  "skipErrorChecking": true,
-  "membersWithOwnFile": [],
-  "flattenOutputFiles": true,
-  "typeDeclarationFormat": "table",
-  "parametersFormat": "list",
-  "typeDeclarationVisibility": "compact",
-  "expandParameters": true,
-  "classPropertiesFormat": "table",
-  "expandObjects": true,
-  "mergeReadme": true,
   "readme": "./src/README.md",
-  "includeVersion": true,
-  "includeHierarchySummary": true,
+  "entryPoints": ["./src/index.ts"],
   "outputs": [
     {
       "name": "markdown",
       "path": "README.md"
     }
-  ]
+  ],
+  "useCodeBlocks": true,
+  "skipErrorChecking": true,
+  "membersWithOwnFile": [],
+  "flattenOutputFiles": true,
+  "classPropertiesFormat": "table",
+  "typeDeclarationFormat": "table",
+  "parametersFormat": "list",
+  "typeDeclarationVisibility": "compact",
+  "excludeReferences": true,
+  "expandParameters": true,
+  "expandObjects": true,
+  "mergeReadme": true,
+  "includeVersion": true,
+  "includeHierarchySummary": true,
 }

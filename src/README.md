@@ -1,8 +1,12 @@
-# lenti [![NPM version][npm-image]][npm-url]
+<a href="https://npmjs.org/package/lenti">
+  <img src="https://badge.fury.io/js/lenti.svg" alt="NPM version"/>
+</a>
 
 Lenti is an image viewer that mimicks the effect of lenticular printing.
 It displays images in a canvas element and binds events for mouse and accelerometer events,
 so just as you would rotate a card or print with lenticular lenses on it, you can tilt your phone to transition between images.
+
+**[Demo](https://danielgamage.github.io/lenti/)**
 
 ## Installation
 ```sh
@@ -41,8 +45,6 @@ Lenti will accomodate any number of images in the container.
 </script>
 ```
 
-**[Demo][demo-page]**
-
 ## Browser Support
 
 <picture>
@@ -51,14 +53,6 @@ Lenti will accomodate any number of images in the container.
   <img src="https://caniuse.bitsofco.de/image/webgpu.jpg" alt="Data on support for the webgpu feature across the major browsers from caniuse.com">
 </picture>
 
-_Thanks to Ire for their [Can IUse Embed](https://caniuse.bitsofco.de/#how-to-use)_
+_Thanks to Ire for their [Can I Use Embed](https://caniuse.bitsofco.de/#how-to-use)_
 
-## API
-<!-- INSERT GENERATED DOCS START -->
-
-<!-- INSERT GENERATED DOCS END -->
-
-
-[npm-image]: https://badge.fury.io/js/lenti.svg
-[npm-url]: https://npmjs.org/package/lenti
-[demo-page]: https://danielgamage.github.io/lenti/
+# API
