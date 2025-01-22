@@ -6,7 +6,7 @@ Lenti is an image viewer that mimicks the effect of lenticular printing.
 It displays images in a canvas element and binds events for mouse and accelerometer events,
 so just as you would rotate a card or print with lenticular lenses on it, you can tilt your phone to transition between images.
 
-**[Demo](https://danielgamage.github.io/lenti/)**
+**[Demo](https://lenti.vercel.app/)**
 
 ## Installation
 ```sh
