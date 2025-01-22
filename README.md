@@ -17,7 +17,7 @@ so just as you would rotate a card or print with lenticular lenses on it, you ca
 npm install --save lenti
 ```
 
-## Basic Usage
+## Usage
 Lenti will accomodate any number of images in the container.
 
 ```html
@@ -30,23 +30,19 @@ Lenti will accomodate any number of images in the container.
     <img src="./images/sample_a_5.png" alt="Right-facing view of object" width="1280" height="720" />
   </div>
 </div>
-<script type="module">
-  import {Lenti, bindGyroscopeXY, bindMouseXY} from "PATH_TO_LENTI"
+```
+```ts
+import {Lenti, bindGyroscopeXY, bindMouseXY} from "lenti"
 
-  let lenti
-  document.addEventListener("DOMContentLoaded", () => {
-    const container = document.querySelector("[data-lenticular-list]")
-    const canvas = document.createElement("canvas")
-    container.appendChild(canvas)
-    lenti = new Lenti({
-      container,
-      canvas,
-      eventRoot: window,
-      images: Array.from(container.querySelectorAll("img")),
-      uiAdapters: [bindMouseXY({eventRoot: window}), bindGyroscopeXY()]
-    })
-  })
-</script>
+const container = document.querySelector("[data-lenticular-list]")
+const canvas = document.createElement("canvas") // programmatically creating canvas. could also just put it in the HTML
+container.appendChild(canvas)
+const lenti = new Lenti({
+  container,
+  canvas,
+  images: Array.from(container.querySelectorAll("img")),
+  uiAdapters: [bindMouseXY({eventRoot: window}), bindGyroscopeXY()]
+})
 ```
 
 ## Browser Support
@@ -65,7 +61,7 @@ _Thanks to Ire for their [Can I Use Embed](https://caniuse.bitsofco.de/#how-to-u
 
 ### Lenti
 
-Defined in: [index.ts:13](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L13)
+Defined in: [index.ts:16](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L16)
 
 TODOs:
 - [ ] Add support for pivotted x/y values
@@ -93,7 +89,7 @@ new Lenti(options: {
  }>): Lenti
 ```
 
-Defined in: [index.ts:79](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L79)
+Defined in: [index.ts:82](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L82)
 
 ###### Parameters
 
@@ -122,18 +118,18 @@ Defined in: [index.ts:79](https://github.com/danielgamage/lenti/blob/db9906f2eb2
 
 | Property | Type | Default value | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="canvas-1"></a> `canvas` | [`HTMLCanvasElement`](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement) | `null` | The output (rendered) canvas | [index.ts:17](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L17) |
-| <a id="images-1"></a> `images` | ( \| [`HTMLCanvasElement`](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement) \| `HTMLOrSVGImageElement` \| [`HTMLVideoElement`](https://developer.mozilla.org/docs/Web/API/HTMLVideoElement) \| [`ImageBitmap`](https://developer.mozilla.org/docs/Web/API/ImageBitmap) \| [`OffscreenCanvas`](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas) \| [`ImageData`](https://developer.mozilla.org/docs/Web/API/ImageData))[] | `[]` | Image elements to pull textures from. Also supports ImageData. | [index.ts:39](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L39) |
-| <a id="inputs-1"></a> `inputs` | \{ `lensDarkening`: `number`; `lensDistortion`: `number`; `stripWidth`: `number`; `transition`: `number`; `viewX`: `number`; `viewY`: `number`; \} | `undefined` | - | [index.ts:57](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L57) |
-| `inputs.lensDarkening` | `number` | `undefined` | Amount of darkening to apply near the virtual off-axis parts of the lenticule | [index.ts:65](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L65) |
-| `inputs.lensDistortion` | `number` | `undefined` | Amount of y-axis distortion applied to the lenticule simulate vertical off-axis viewing | [index.ts:69](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L69) |
-| `inputs.stripWidth` | `number` | `undefined` | Image-space width of the strip placed in an interlaced array under the lenticule | [index.ts:59](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L59) |
-| `inputs.transition` | `number` | `undefined` | Amount of virtual warping to apply to the transition from left–right | [index.ts:67](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L67) |
-| `inputs.viewX` | `number` | `undefined` | [0: Leftmost image, 1: Rightmost image] | [index.ts:61](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L61) |
-| `inputs.viewY` | `number` | `undefined` | [0: Top distortion, 1: Bottom distortion] | [index.ts:63](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L63) |
-| <a id="isvisible-1"></a> `isVisible` | `boolean` | `false` | Whether the canvas is visible in the viewport | [index.ts:31](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L31) |
-| <a id="oversampling-1"></a> `oversampling` | `number` | `2` | Canvas oversampling | [index.ts:36](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L36) |
-| <a id="uiadapters-1"></a> `uiAdapters` | `UIAdapter`[] | `undefined` | UI adapters connect user input to the shader settings, custom adapters can be made **Default** `[bindMouseXY(), bindGyroscopeXY()]` | [index.ts:26](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L26) |
+| <a id="canvas-1"></a> `canvas` | [`HTMLCanvasElement`](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement) | `null` | The output (rendered) canvas | [index.ts:20](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L20) |
+| <a id="images-1"></a> `images` | ( \| [`HTMLCanvasElement`](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement) \| `HTMLOrSVGImageElement` \| [`HTMLVideoElement`](https://developer.mozilla.org/docs/Web/API/HTMLVideoElement) \| [`ImageBitmap`](https://developer.mozilla.org/docs/Web/API/ImageBitmap) \| [`OffscreenCanvas`](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas) \| [`ImageData`](https://developer.mozilla.org/docs/Web/API/ImageData))[] | `[]` | Image elements to pull textures from. Also supports ImageData. | [index.ts:42](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L42) |
+| <a id="inputs-1"></a> `inputs` | \{ `lensDarkening`: `number`; `lensDistortion`: `number`; `stripWidth`: `number`; `transition`: `number`; `viewX`: `number`; `viewY`: `number`; \} | `undefined` | - | [index.ts:60](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L60) |
+| `inputs.lensDarkening` | `number` | `undefined` | Amount of darkening to apply near the virtual off-axis parts of the lenticule | [index.ts:68](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L68) |
+| `inputs.lensDistortion` | `number` | `undefined` | Amount of y-axis distortion applied to the lenticule simulate vertical off-axis viewing | [index.ts:72](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L72) |
+| `inputs.stripWidth` | `number` | `undefined` | Image-space width of the strip placed in an interlaced array under the lenticule | [index.ts:62](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L62) |
+| `inputs.transition` | `number` | `undefined` | Amount of virtual warping to apply to the transition from left–right | [index.ts:70](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L70) |
+| `inputs.viewX` | `number` | `undefined` | [0: Leftmost image, 1: Rightmost image] | [index.ts:64](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L64) |
+| `inputs.viewY` | `number` | `undefined` | [0: Top distortion, 1: Bottom distortion] | [index.ts:66](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L66) |
+| <a id="isvisible-1"></a> `isVisible` | `boolean` | `false` | Whether the canvas is visible in the viewport | [index.ts:34](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L34) |
+| <a id="oversampling-1"></a> `oversampling` | `number` | `2` | Canvas oversampling | [index.ts:39](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L39) |
+| <a id="uiadapters-1"></a> `uiAdapters` | [`UIAdapter`](README.md#uiadapter)[] | `undefined` | UI adapters connect user input to the shader settings, custom adapters can be made **Default** `[bindMouseXY(), bindGyroscopeXY()]` | [index.ts:29](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L29) |
 
 #### Accessors
 
@@ -145,7 +141,7 @@ Defined in: [index.ts:79](https://github.com/danielgamage/lenti/blob/db9906f2eb2
 get imageAspectRatio(): number
 ```
 
-Defined in: [index.ts:240](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L240)
+Defined in: [index.ts:243](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L243)
 
 ###### Returns
 
@@ -159,7 +155,7 @@ Defined in: [index.ts:240](https://github.com/danielgamage/lenti/blob/db9906f2eb
 createTextureFromImage(imageData: ImageData): Promise<GPUTexture>
 ```
 
-Defined in: [index.ts:392](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L392)
+Defined in: [index.ts:393](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L393)
 
 ###### Parameters
 
@@ -179,7 +175,7 @@ Defined in: [index.ts:392](https://github.com/danielgamage/lenti/blob/db9906f2eb
 error(e: Error): void
 ```
 
-Defined in: [index.ts:487](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L487)
+Defined in: [index.ts:487](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L487)
 
 ###### Parameters
 
@@ -199,7 +195,7 @@ Defined in: [index.ts:487](https://github.com/danielgamage/lenti/blob/db9906f2eb
 init(): Promise<void>
 ```
 
-Defined in: [index.ts:247](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L247)
+Defined in: [index.ts:250](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L250)
 
 ###### Returns
 
@@ -213,7 +209,7 @@ Defined in: [index.ts:247](https://github.com/danielgamage/lenti/blob/db9906f2eb
 render(): void
 ```
 
-Defined in: [index.ts:436](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L436)
+Defined in: [index.ts:436](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L436)
 
 ###### Returns
 
@@ -234,7 +230,7 @@ update(updates: Partial<{
  }>): void
 ```
 
-Defined in: [index.ts:427](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L427)
+Defined in: [index.ts:427](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L427)
 
 ###### Parameters
 
@@ -261,7 +257,7 @@ Defined in: [index.ts:427](https://github.com/danielgamage/lenti/blob/db9906f2eb
 type NormalizedNumber = number;
 ```
 
-Defined in: [index.ts:5](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/index.ts#L5)
+Defined in: [index.ts:8](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/index.ts#L8)
 
 A number in the range [0, 1]
 
@@ -273,7 +269,7 @@ A number in the range [0, 1]
 type UIAdapter = (lentiInstance: Lenti) => void;
 ```
 
-Defined in: [adapters.ts:26](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/adapters.ts#L26)
+Defined in: [adapters.ts:26](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/adapters.ts#L26)
 
 UI Adapaters listen for events on a page and can access Lenti properties throughout the instance lifecycle.
 UIAdapters expect a Lenti instance to be passed to them, and can be used to bind user input to shader settings.
@@ -314,7 +310,7 @@ new Lenti({uiAdapters: [bindDaylightFactory({daylight: 0.5})]})
 type UIAdapterFactory = (options?: any) => UIAdapter;
 ```
 
-Defined in: [adapters.ts:28](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/adapters.ts#L28)
+Defined in: [adapters.ts:28](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/adapters.ts#L28)
 
 UIAdapterFactory is an initializing function that is passed options for the UIAdapater it contains.
 
@@ -341,7 +337,7 @@ function bindGyroscopeXY(options: {
  }): UIAdapter
 ```
 
-Defined in: [adapters.ts:34](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/adapters.ts#L34)
+Defined in: [adapters.ts:34](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/adapters.ts#L34)
 
 Drives viewX/viewY based on the device viewing angle
 
@@ -390,7 +386,7 @@ function bindMouseXY(options: {
  }): UIAdapter
 ```
 
-Defined in: [adapters.ts:118](https://github.com/danielgamage/lenti/blob/db9906f2eb28cbc17ce211ee9eaee1e9c542af78/src/adapters.ts#L118)
+Defined in: [adapters.ts:118](https://github.com/danielgamage/lenti/blob/5aa77fcd24e8eeafc88b21b22777d3944f50146f/src/adapters.ts#L118)
 
 Drives viewX/viewY based on the mouse position on the element, in the browser window, or in another element (like a touchstrip element)
 

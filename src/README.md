@@ -30,17 +30,14 @@ Lenti will accomodate any number of images in the container.
 ```ts
 import {Lenti, bindGyroscopeXY, bindMouseXY} from "lenti"
 
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.querySelector("[data-lenticular-list]")
-  const canvas = document.createElement("canvas")
-  container.appendChild(canvas)
-  const lenti = new Lenti({
-    container,
-    canvas,
-    eventRoot: window,
-    images: Array.from(container.querySelectorAll("img")),
-    uiAdapters: [bindMouseXY({eventRoot: window}), bindGyroscopeXY()]
-  })
+const container = document.querySelector("[data-lenticular-list]")
+const canvas = document.createElement("canvas") // programmatically creating canvas. could also just put it in the HTML
+container.appendChild(canvas)
+const lenti = new Lenti({
+  container,
+  canvas,
+  images: Array.from(container.querySelectorAll("img")),
+  uiAdapters: [bindMouseXY({eventRoot: window}), bindGyroscopeXY()]
 })
 ```
 
