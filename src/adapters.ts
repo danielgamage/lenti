@@ -38,7 +38,9 @@ export const bindGyroscopeXY = (options: {
   yBounds: [number, number],
   /** when the deviceorientation listener is initiated, measure values against the start */
   relative?: boolean,
-  /** Some browsers require user gesture before requesting permission. This is the element that will require click if so. */
+  /** Some browsers require user gesture before requesting permission. This is the element that will require click if so.
+   * By default, this is the Lenti instance's canvas element, but it can be a button or other interactive element.
+   */
   userGestureElement?: HTMLElement,
 } = {xBounds: [-45, 45], yBounds: [0,90]}): UIAdapter => {
   const degtorad = Math.PI / 180; // Degree-to-Radian conversion
