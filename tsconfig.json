@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "types": ["@webgpu/types"],
+    "target": "ESNext",
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "declarationMap": true,
+    "declarationDir": "dist",
+    "declaration": true,
+  }
+}

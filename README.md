@@ -1,160 +1,405 @@
-# lenti [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
-> Lenticular image viewer
+**lenti v0.3.0**
 
-Lenti is an image viewer that mimicks the effect of lenticular printing. It displays images in a canvas element and binds events for mouse and accelerometer events, so just as you would rotate a card or print with lenticular lenses on it, you can tilt your phone to transition between images.
+***
 
-**[Demo][demo-page]**
+<a href="https://npmjs.org/package/lenti">
+  <img src="https://badge.fury.io/js/lenti.svg" alt="NPM version"/>
+</a>
+
+Lenti is an image viewer that mimicks the effect of lenticular printing.
+It displays images in a canvas element and binds events for mouse and accelerometer events,
+so just as you would rotate a card or print with lenticular lenses on it, you can tilt your phone to transition between images.
+
+**[Demo](https://lenti.vercel.app/)**
 
 ## Installation
-
 ```sh
-$ npm install --save lenti
+npm install --save lenti
 ```
 
-## Basic Usage
-
-Lenti will accomodate any number of images in the container (be good to your RAM and don’t go wild, though).
+## Usage
+Lenti will accomodate any number of images in the container.
 
 ```html
-<div data-lenticular-list="true" >
-  <img src="assets/images/1.jpg" alt="Blue Image" width="1280" height="720" />
-  <img src="assets/images/2.jpg" alt="Blue Image" width="1280" height="720" />
-  <img src="assets/images/3.jpg" alt="Blue Image" width="1280" height="720" />
-  <img src="assets/images/4.jpg" alt="Blue Image" width="1280" height="720" />
+<div class="wrapper">
+  <div data-lenticular-list="true">
+    <img src="./images/sample_a_1.png" alt="Left-facing view of object" width="1280" height="720" />
+    <img src="./images/sample_a_2.png" alt="Center-left-facing view of object" width="1280" height="720" />
+    <img src="./images/sample_a_3.png" alt="Center-facing view of object" width="1280" height="720" />
+    <img src="./images/sample_a_4.png" alt="Center-right-facing view of object" width="1280" height="720" />
+    <img src="./images/sample_a_5.png" alt="Right-facing view of object" width="1280" height="720" />
+  </div>
 </div>
 ```
+```ts
+import {Lenti, bindGyroscopeXY, bindMouseXY} from "lenti"
 
-```js
-import Lenti from 'lenti'
-
-let lenticulars = document.querySelectorAll('[data-lenticular-list]')
-let instances = []
-// convert → array & loop through
-;[...lenticulars].map((el, i) => {
-  // store instance in array for further manipulation
-  instances[i] = new Lenti({container: el, width: 1280, height: 720})
-  // initialize instance
-  instances[i].init()
+const container = document.querySelector("[data-lenticular-list]")
+const canvas = document.createElement("canvas") // programmatically creating canvas. could also just put it in the HTML
+container.appendChild(canvas)
+const lenti = new Lenti({
+  container,
+  canvas,
+  images: Array.from(container.querySelectorAll("img")),
+  uiAdapters: [bindMouseXY({eventRoot: window}), bindGyroscopeXY()]
 })
 ```
 
-## Options
+## Browser Support
 
-#### `container`
-**Required**
+<picture>
+  <source type="image/webp" srcset="https://caniuse.bitsofco.de/image/webgpu.webp">
+  <source type="image/png" srcset="https://caniuse.bitsofco.de/image/webgpu.png">
+  <img src="https://caniuse.bitsofco.de/image/webgpu.jpg" alt="Data on support for the webgpu feature across the major browsers from caniuse.com">
+</picture>
 
-Specifies the HTMLElement (not selector) that contains the images.
+_Thanks to Ire for their [Can I Use Embed](https://caniuse.bitsofco.de/#how-to-use)_
 
-#### `accelerometerEvents`
-**default**: true
+# API
 
-Turns tilt interaction on or off.
+## Classes
 
-#### `mouseEvents`
-**default**: true
+### Lenti
 
-Turns mouse hover interaction on or off.
+Defined in: [index.ts:16](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L16)
 
-#### `stripWidth`
-**default**: 16
+TODOs:
+- [ ] Add support for pivotted x/y values
+- [ ] Add support for touch events
+- [ ] MSAA instead of just rendering higher resolutions
 
-The horizontal width (in pixels) of each lens strip.
+#### Constructors
 
-#### `height` & `width`
-**default**: 50
+##### new Lenti()
 
-The height and width of the canvas (in pixels). You **definitely should** match this to the value of your images (which should all be the same size)
-
-#### `tiltMax`
-**default**: 45
-#### `tiltMin`
-**default**: -45
-
-For the accelerometer event listener, define the max and min tiltable angle for interaction.
-
-## Instance Methods
-#### `Lenti.init()`
-Runs setup functions.
-#### `Lenti.bindEvents()`
-#### `Lenti.destroy()`
-Binds (`bindEvents`) or unbinds (`destroy`) events.
-#### `Lenti.handleSizing()`
-Measures the sizing of the box for further calculations. By default the event bindings will call this on resize. If you are resizing a container manually, you should probably fire this.
-#### `Lenti.getBoxPosition()`
-#### `Lenti.checkVisibility()`
-This
-#### `Lenti.redraw(balance)`
-Refreshes the viewer for the given `balance`, where `balance` is a float from `0–1` that represents the position in the image sequence. A value of 0 will show the first image, and a value of 1 will show the last. See [custom events](#custom-events) for an example of this.
-#### `Lenti.remap(value, inLow, inHigh, outLow, outHigh)`
-Helper function to map values from one range to another. You'll likely use this to map values to the range `0–1` for `Lenti.redraw()`.
-
-
-## Custom events
-Lenti doesn't make too many assumptions about your environment. You may turn off the default event handlers (see `accelerometerEvents` and `mouseEvents`) and make your own interaction system. Just send a value between 0–1 to your instance at `Lenti.redraw()`.
-
-In the following example, we show how a spring physics library ([rebound](https://github.com/facebook/rebound-js)) can be used as a sort of middleware in Lenti:
-
-```js
-import Lenti from 'lenti'
-import rebound from 'rebound'
-
-let lenticulars = document.querySelectorAll('[data-lenticular-list]')
-let instances = []
-// convert → array & loop through
-;[...lenticulars].map((el, i) => {
-	const image = el.querySelector('img')
-	// store instance in array for further manipulation
-	instances[i] = new Lenti({
-		container: el,
-		width: image.width,
-		height: image.height,
-		stripWidth: el.getAttribute('data-strip-width'),
-		mouseEvents: false // this is the key
-	})
-	let _this = instances[i]
-
-	// set up spring
-	const springSystem = new rebound.SpringSystem();
-	const springConfig = [40, 9] // tension, friction
-	const balanceSpring = springSystem.createSpring(...springConfig);
-	balanceSpring.addListener({ onSpringUpdate: (balanceSpring) => {
-		_this.redraw(balanceSpring.getCurrentValue())
-	}})
-	// initialize instance
-	_this.init()
-
-	// set initial value
-	balanceSpring.setEndValue(1)
-
-	// bind mouse events
-	_this.canvas.addEventListener('mousemove', (e) => {
-		const balance = _this.remap(e.offsetX / _this.canvasWidth, 0, 1, 1, 0)
-		balanceSpring.setEndValue(balance)
-	})
-})
-```
-After disabling the default mouse event handler, we set up a new event listener (`mousemove`), map the value of `e.offsetX / _this.canvasWidth` to the range 1–0 (just inverting the range here), and send the value to `balanceSpring`, which interpolates the value. We tell `balanceSpring` to send the spring value to our instance method at `Lenti.redraw()` as it updates. Check the [demo page][demo-page] to see this example in use.
-
-You can imagine that this example does not demonstrate the full flexibility you have here, and that you could, for instance, replace the default gamma-rotation accelerometer event with events for a different axis, use ambient light sensors to change the value, have timed animations driven by any arbitrary event, and so on.
-
-## Cross-origin images
-Because Lenti uses canvas to produce this effect, most browsers will be upset if you fetch an image from another origin. Be sure to set `crossorigin="anonymous"`  on your images:
-
-```html
-<img src="https://flickr.com/images/x/1280/720/1.jpg" alt="Blue Image" crossorigin="anonymous" width="1280" height="720" />
+```ts
+new Lenti(options: {
+  canvas: HTMLCanvasElement;
+  images: HTMLImageElement[];
+  oversampling: number;
+  samplerSettings: GPUSamplerDescriptor;
+  uiAdapters: (this: any, options: object) => void[];
+ } & Partial<{
+  lensDarkening: number;
+  lensDistortion: number;
+  stripWidth: number;
+  transition: number;
+  viewX: number;
+  viewY: number;
+ }>): Lenti
 ```
 
-## License
+Defined in: [index.ts:82](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L82)
 
-Apache-2.0 © [Daniel Gamage](https://danielgamage.com)
+###### Parameters
 
+###### options
 
-[npm-image]: https://badge.fury.io/js/lenti.svg
-[npm-url]: https://npmjs.org/package/lenti
-[travis-image]: https://travis-ci.org/danielgamage/lenti.svg?branch=master
-[travis-url]: https://travis-ci.org/danielgamage/lenti
-[daviddm-image]: https://david-dm.org/danielgamage/lenti.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/danielgamage/lenti
-[coveralls-image]: https://coveralls.io/repos/danielgamage/lenti/badge.svg
-[coveralls-url]: https://coveralls.io/r/danielgamage/lenti
-[demo-page]: https://danielgamage.github.io/lenti/
+\{
+  `canvas`: [`HTMLCanvasElement`](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement);
+  `images`: [`HTMLImageElement`](https://developer.mozilla.org/docs/Web/API/HTMLImageElement)[];
+  `oversampling`: `number`;
+  `samplerSettings`: `GPUSamplerDescriptor`;
+  `uiAdapters`: (`this`: `any`, `options`: `object`) => `void`[];
+ \} & [`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<\{
+  `lensDarkening`: `number`;
+  `lensDistortion`: `number`;
+  `stripWidth`: `number`;
+  `transition`: `number`;
+  `viewX`: `number`;
+  `viewY`: `number`;
+ \}\>
+
+###### Returns
+
+[`Lenti`](README.md#lenti)
+
+#### Properties
+
+| Property | Type | Default value | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="canvas-1"></a> `canvas` | [`HTMLCanvasElement`](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement) | `null` | The output (rendered) canvas | [index.ts:20](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L20) |
+| <a id="images-1"></a> `images` | ( \| [`HTMLCanvasElement`](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement) \| `HTMLOrSVGImageElement` \| [`HTMLVideoElement`](https://developer.mozilla.org/docs/Web/API/HTMLVideoElement) \| [`ImageBitmap`](https://developer.mozilla.org/docs/Web/API/ImageBitmap) \| [`OffscreenCanvas`](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas) \| [`ImageData`](https://developer.mozilla.org/docs/Web/API/ImageData))[] | `[]` | Image elements to pull textures from. Also supports ImageData. | [index.ts:42](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L42) |
+| <a id="inputs-1"></a> `inputs` | \{ `lensDarkening`: `number`; `lensDistortion`: `number`; `stripWidth`: `number`; `transition`: `number`; `viewX`: `number`; `viewY`: `number`; \} | `undefined` | - | [index.ts:60](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L60) |
+| `inputs.lensDarkening` | `number` | `undefined` | Amount of darkening to apply near the virtual off-axis parts of the lenticule | [index.ts:68](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L68) |
+| `inputs.lensDistortion` | `number` | `undefined` | Amount of y-axis distortion applied to the lenticule simulate vertical off-axis viewing | [index.ts:72](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L72) |
+| `inputs.stripWidth` | `number` | `undefined` | Image-space width of the strip placed in an interlaced array under the lenticule | [index.ts:62](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L62) |
+| `inputs.transition` | `number` | `undefined` | Amount of virtual warping to apply to the transition from left–right | [index.ts:70](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L70) |
+| `inputs.viewX` | `number` | `undefined` | [0: Leftmost image, 1: Rightmost image] | [index.ts:64](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L64) |
+| `inputs.viewY` | `number` | `undefined` | [0: Top distortion, 1: Bottom distortion] | [index.ts:66](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L66) |
+| <a id="isvisible-1"></a> `isVisible` | `boolean` | `false` | Whether the canvas is visible in the viewport | [index.ts:34](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L34) |
+| <a id="oversampling-1"></a> `oversampling` | `number` | `2` | Canvas oversampling | [index.ts:39](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L39) |
+| <a id="uiadapters-1"></a> `uiAdapters` | [`UIAdapter`](README.md#uiadapter)[] | `undefined` | UI adapters connect user input to the shader settings, custom adapters can be made **Default** `[bindMouseXY(), bindGyroscopeXY()]` | [index.ts:29](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L29) |
+
+#### Accessors
+
+##### imageAspectRatio
+
+###### Get Signature
+
+```ts
+get imageAspectRatio(): number
+```
+
+Defined in: [index.ts:243](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L243)
+
+###### Returns
+
+`number`
+
+#### Methods
+
+##### createTextureFromImage()
+
+```ts
+createTextureFromImage(imageData: ImageData): Promise<GPUTexture>
+```
+
+Defined in: [index.ts:393](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L393)
+
+###### Parameters
+
+###### imageData
+
+[`ImageData`](https://developer.mozilla.org/docs/Web/API/ImageData)
+
+###### Returns
+
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`GPUTexture`](https://developer.mozilla.org/docs/Web/API/GPUTexture)\>
+
+***
+
+##### error()
+
+```ts
+error(e: Error): void
+```
+
+Defined in: [index.ts:487](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L487)
+
+###### Parameters
+
+###### e
+
+[`Error`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)
+
+###### Returns
+
+`void`
+
+***
+
+##### init()
+
+```ts
+init(): Promise<void>
+```
+
+Defined in: [index.ts:250](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L250)
+
+###### Returns
+
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+
+***
+
+##### render()
+
+```ts
+render(): void
+```
+
+Defined in: [index.ts:436](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L436)
+
+###### Returns
+
+`void`
+
+***
+
+##### update()
+
+```ts
+update(updates: Partial<{
+  lensDarkening: number;
+  lensDistortion: number;
+  stripWidth: number;
+  transition: number;
+  viewX: number;
+  viewY: number;
+ }>): void
+```
+
+Defined in: [index.ts:427](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L427)
+
+###### Parameters
+
+###### updates
+
+[`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<\{
+  `lensDarkening`: `number`;
+  `lensDistortion`: `number`;
+  `stripWidth`: `number`;
+  `transition`: `number`;
+  `viewX`: `number`;
+  `viewY`: `number`;
+ \}\>
+
+###### Returns
+
+`void`
+
+## Type Aliases
+
+### NormalizedNumber
+
+```ts
+type NormalizedNumber = number;
+```
+
+Defined in: [index.ts:8](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/index.ts#L8)
+
+A number in the range [0, 1]
+
+***
+
+### UIAdapter()
+
+```ts
+type UIAdapter = (lentiInstance: Lenti) => void;
+```
+
+Defined in: [adapters.ts:26](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/adapters.ts#L26)
+
+UI Adapaters listen for events on a page and can access Lenti properties throughout the instance lifecycle.
+UIAdapters expect a Lenti instance to be passed to them, and can be used to bind user input to shader settings.
+In practice, this can be as simple as:
+```ts
+// Sets the lensDarkening based on the amount of daylight when the page loads
+new Lenti({uiAdapters: [function bindDaylight(lentiInstance: Lenti) => {
+  lentiInstance.inputs.lensDarkening = 0.5
+})]})
+```
+If you want your UIAdapter to be reusable and configurable, you can create a UIAdapterFactory that returns the UIAdapter.
+```ts
+// Sets the lensDarkening based on the amount of daylight when the page loads
+const bindDaylightFactory = (options: {daylight: number}) => {
+  return function bindDaylight(lentiInstance: Lenti) => {
+    lentiInstance.inputs.lensDarkening = 1 - options.daylight
+  }
+}
+
+new Lenti({uiAdapters: [bindDaylightFactory({daylight: 0.5})]})
+```
+
+#### Parameters
+
+##### lentiInstance
+
+[`Lenti`](README.md#lenti)
+
+#### Returns
+
+`void`
+
+***
+
+### UIAdapterFactory()
+
+```ts
+type UIAdapterFactory = (options?: any) => UIAdapter;
+```
+
+Defined in: [adapters.ts:28](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/adapters.ts#L28)
+
+UIAdapterFactory is an initializing function that is passed options for the UIAdapater it contains.
+
+#### Parameters
+
+##### options?
+
+`any`
+
+#### Returns
+
+[`UIAdapter`](README.md#uiadapter)
+
+## UI Adapters
+
+### bindGyroscopeXY()
+
+```ts
+function bindGyroscopeXY(options: {
+  relative: boolean;
+  userGestureElement: HTMLElement;
+  xBounds: [number, number];
+  yBounds: [number, number];
+ }): UIAdapter
+```
+
+Defined in: [adapters.ts:34](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/adapters.ts#L34)
+
+Drives viewX/viewY based on the device viewing angle
+
+#### Parameters
+
+##### options
+
+###### relative
+
+`boolean`
+
+when the deviceorientation listener is initiated, measure values against the start
+
+###### userGestureElement
+
+[`HTMLElement`](https://developer.mozilla.org/docs/Web/API/HTMLElement)
+
+Some browsers require user gesture before requesting permission. This is the element that will require click if so.
+By default, this is the Lenti instance's canvas element, but it can be a button or other interactive element.
+
+###### xBounds
+
+\[`number`, `number`\]
+
+changes x values
+
+###### yBounds
+
+\[`number`, `number`\]
+
+changes y values
+
+#### Returns
+
+[`UIAdapter`](README.md#uiadapter)
+
+***
+
+### bindMouseXY()
+
+```ts
+function bindMouseXY(options: {
+  eventRoot:   | HTMLElement
+     | Window
+     | Document;
+ }): UIAdapter
+```
+
+Defined in: [adapters.ts:118](https://github.com/danielgamage/lenti/blob/2804a1deed186855e68e096efcc3918cec478098/src/adapters.ts#L118)
+
+Drives viewX/viewY based on the mouse position on the element, in the browser window, or in another element (like a touchstrip element)
+
+#### Parameters
+
+##### options
+
+###### eventRoot
+
+  \| [`HTMLElement`](https://developer.mozilla.org/docs/Web/API/HTMLElement)
+  \| [`Window`](https://developer.mozilla.org/docs/Web/API/Window)
+  \| [`Document`](https://developer.mozilla.org/docs/Web/API/Document)
+
+#### Returns
+
+[`UIAdapter`](README.md#uiadapter)
