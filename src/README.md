@@ -13,7 +13,7 @@ so just as you would rotate a card or print with lenticular lenses on it, you ca
 npm install --save lenti
 ```
 
-## Basic Usage
+## Usage
 Lenti will accomodate any number of images in the container.
 
 ```html
@@ -26,23 +26,22 @@ Lenti will accomodate any number of images in the container.
     <img src="./images/sample_a_5.png" alt="Right-facing view of object" width="1280" height="720" />
   </div>
 </div>
-<script type="module">
-  import {Lenti, bindGyroscopeXY, bindMouseXY} from "PATH_TO_LENTI"
+```
+```ts
+import {Lenti, bindGyroscopeXY, bindMouseXY} from "lenti"
 
-  let lenti
-  document.addEventListener("DOMContentLoaded", () => {
-    const container = document.querySelector("[data-lenticular-list]")
-    const canvas = document.createElement("canvas")
-    container.appendChild(canvas)
-    lenti = new Lenti({
-      container,
-      canvas,
-      eventRoot: window,
-      images: Array.from(container.querySelectorAll("img")),
-      uiAdapters: [bindMouseXY({eventRoot: window}), bindGyroscopeXY()]
-    })
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.querySelector("[data-lenticular-list]")
+  const canvas = document.createElement("canvas")
+  container.appendChild(canvas)
+  const lenti = new Lenti({
+    container,
+    canvas,
+    eventRoot: window,
+    images: Array.from(container.querySelectorAll("img")),
+    uiAdapters: [bindMouseXY({eventRoot: window}), bindGyroscopeXY()]
   })
-</script>
+})
 ```
 
 ## Browser Support
