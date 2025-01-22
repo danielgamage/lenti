@@ -5,3 +5,10 @@ coverage/
 .editorconfig
 .gitignore
 tsconfig.json
+typedoc.json
+index.html
+.prettierrc
+images/
+docs/
+.github/
+rollup.config.js
