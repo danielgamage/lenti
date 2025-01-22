@@ -1,5 +1,8 @@
 import { makeShaderDataDefinitions, makeStructuredView, StructuredView } from "webgpu-utils"
-export { bindGyroscopeXY, bindMouseXY, UIAdapter, UIAdapterFactory } from "./adapters.ts"
+import { bindGyroscopeXY, bindMouseXY } from "./adapters.ts"
+export { bindGyroscopeXY, bindMouseXY } from "./adapters.ts"
+import type {UIAdapter, UIAdapterFactory} from "./adapters.ts"
+export type {UIAdapter, UIAdapterFactory} from "./adapters.ts"
 
 /** A number in the range [0, 1] */
 export type NormalizedNumber = number
@@ -280,11 +283,9 @@ export class Lenti {
     const defs = makeShaderDataDefinitions(this.#shaderSource)
     if (defs.uniforms !== undefined) {
       this.#uniforms = makeStructuredView(defs.uniforms.customUniforms)
-      console.log(this.#uniforms, !this.#uniforms)
     }
 
     if (!this.#uniforms) {
-      console.log("this c")
       this.error(new Error("Uniforms not initialized"))
       return
     }
@@ -396,7 +397,6 @@ export class Lenti {
       return
     }
     if (!this.#uniforms) {
-      console.log("this a")
       this.error(new Error("Uniforms not initialized"))
       return
     }
