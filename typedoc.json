@@ -1,5 +1,5 @@
 {
-  "plugin": ["typedoc-plugin-markdown"],
+  "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-dt-links", "typedoc-plugin-mdn-links"],
   "out": "./docs",
   "skipErrorChecking": true,
   "membersWithOwnFile": [],
@@ -10,4 +10,14 @@
   "expandParameters": true,
   "classPropertiesFormat": "table",
   "expandObjects": true,
+  "mergeReadme": true,
+  "readme": "./src/README.md",
+  "includeVersion": true,
+  "includeHierarchySummary": true,
+  "outputs": [
+    {
+      "name": "markdown",
+      "path": "README.md"
+    }
+  ]
 }

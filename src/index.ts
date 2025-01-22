@@ -43,7 +43,7 @@ export const bindGyroscopeXY = (options: {
   relative?: boolean,
   /** Some browsers require user gesture before requesting permission. This is the element that will require click if so. */
   userGestureElement?: HTMLElement,
-} = {xBounds: [-45, 45], yBounds: [0,90]}) => {
+} = {xBounds: [-45, 45], yBounds: [0,90]}): UIAdapter => {
   const degtorad = Math.PI / 180; // Degree-to-Radian conversion
   /** https://www.w3.org/TR/orientation-event/ */
   const getRotationMatrix = ( alpha, beta, gamma ) => {
@@ -116,7 +116,7 @@ export const bindGyroscopeXY = (options: {
  * Drives viewX/viewY based on the mouse position on the element, in the browser window, or in another element (like a touchstrip element)
  * @group UI Adapters
  */
-export const bindMouseXY = (options: {eventRoot?: HTMLElement | Window | Document | null } = {}) => {
+export const bindMouseXY = (options: {eventRoot?: HTMLElement | Window | Document | null } = {}): UIAdapter => {
   return (lentiInstance: Lenti) => {
     const root = options.eventRoot ?? lentiInstance.canvas
     if (!root) {
