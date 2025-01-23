@@ -1,5 +1,7 @@
 import { makeShaderDataDefinitions, makeStructuredView, StructuredView } from "webgpu-utils"
 
+/** A positive integer */
+export type PositiveInteger = number
 /** A number in the range [0, 1] */
 export type NormalizedNumber = number
 /** Helper
@@ -211,7 +213,7 @@ export class Lenti {
   }
   inputs: {
     /** Image-space width of the strip placed in an interlaced array under the lenticule */
-    stripWidth: number,
+    stripWidth: PositiveInteger,
     /** [0: Leftmost image, 1: Rightmost image] */
     viewX: NormalizedNumber,
     /** [0: Top distortion, 1: Bottom distortion] */
