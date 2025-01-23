@@ -92,7 +92,7 @@ export const bindGyroscopeXY = (options: {
     const handleOrientation = (e: DeviceOrientationEvent) => {
       const matrix = getRotationMatrix(e.alpha, e.beta, e.gamma);
       const viewX = clamp(
-        remap(matrix[2], [options.xBounds[0] / 90, options.xBounds[1] / 90], [0, 1]),
+        remap(matrix[2], [options.xBounds[0] / 90, options.xBounds[1] / 90], [1, 0]),
         0, 1
       );
       const viewY = clamp(
