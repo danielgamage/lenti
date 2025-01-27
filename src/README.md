@@ -17,14 +17,12 @@ npm install --save lenti
 Lenti will accomodate any number of images in the container.
 
 ```html
-<div class="wrapper">
-  <div data-lenticular-list="true">
-    <img src="./images/sample_a_1.png" alt="Left-facing view of object" width="1280" height="720" />
-    <img src="./images/sample_a_2.png" alt="Center-left-facing view of object" width="1280" height="720" />
-    <img src="./images/sample_a_3.png" alt="Center-facing view of object" width="1280" height="720" />
-    <img src="./images/sample_a_4.png" alt="Center-right-facing view of object" width="1280" height="720" />
-    <img src="./images/sample_a_5.png" alt="Right-facing view of object" width="1280" height="720" />
-  </div>
+<div data-lenticular-list="true">
+  <img src="./images/sample_a_1.png" alt="Left-facing view of object" width="1280" height="720" />
+  <img src="./images/sample_a_2.png" alt="Center-left-facing view of object" width="1280" height="720" />
+  <img src="./images/sample_a_3.png" alt="Center-facing view of object" width="1280" height="720" />
+  <img src="./images/sample_a_4.png" alt="Center-right-facing view of object" width="1280" height="720" />
+  <img src="./images/sample_a_5.png" alt="Right-facing view of object" width="1280" height="720" />
 </div>
 ```
 ```ts
@@ -42,6 +40,8 @@ const lenti = new Lenti({
 ```
 
 ## Browser Support
+
+Lenti relies on WebGPU for buttery-smooth framerates on modern computers. Unflagged browser support below:
 
 <picture>
   <source type="image/webp" srcset="https://caniuse.bitsofco.de/image/webgpu.webp">

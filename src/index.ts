@@ -1,5 +1,7 @@
 import { makeShaderDataDefinitions, makeStructuredView, StructuredView } from "webgpu-utils"
 
+/** A number representing degrees (typically [-360, 360]) */
+export type Degree = number
 /** A positive integer */
 export type PositiveInteger = number
 /** A number in the range [0, 1] */
@@ -15,8 +17,13 @@ export const clamp = (value: number, min: number, max: number) =>  Math.min(Math
 export const remap = (value: number, domain: [number, number], range: [number, number]) =>  range[0] + (value - domain[0]) * (range[1] - range[0]) / (domain[1] - domain[0])
 
 /**
+ * @categoryDescription UI Adapters
+ */
+/**
  * UI Adapaters listen for events on a page and can access Lenti properties throughout the instance lifecycle.
- * UIAdapters expect a Lenti instance to be passed to them, and can be used to bind user input to shader settings.
+ *
+ * UIAdapters expect a {@link Lenti} instance to be passed to them, and can be used to bind user input to shader settings.
+ *
  * In practice, this can be as simple as:
  * ```ts
  * // Sets the lensDarkening based on the amount of daylight when the page loads
@@ -24,7 +31,23 @@ export const remap = (value: number, domain: [number, number], range: [number, n
  *   lentiInstance.inputs.lensDarkening = 0.5
  * })]})
  * ```
- * If you want your UIAdapter to be reusable and configurable, you can create a UIAdapterFactory that returns the UIAdapter.
+ * @category Managing User Interaction
+ *
+ *
+*/
+export type UIAdapter = (lentiInstance: Lenti) => UIAdapterCleanupCallback | void;
+/**
+ * UIAdapterCleanupCallback is a function that is called when a Lenti instance is destroyed.
+ *
+ * Some cases might be usage in a single-page application where the Lenti instance
+ * is created and destroyed multiple times as a user navigates the site.
+ * @category Managing User Interaction
+ */
+export type UIAdapterCleanupCallback = () => void;
+/**
+ * UIAdapterFactory is an initializing function that is passed options for the UIAdapater it contains.
+ *
+ * If you want your UIAdapter to be reusable and configurable, you can create a {@link UIAdapterFactory} that returns the {@link UIAdapter}.
  * ```ts
  * // Sets the lensDarkening based on the amount of daylight when the page loads
  * const bindDaylightFactory = (options: {daylight: number}) => {
@@ -35,28 +58,28 @@ export const remap = (value: number, domain: [number, number], range: [number, n
  *
  * new Lenti({uiAdapters: [bindDaylightFactory({daylight: 0.5})]})
  * ```
- *
-*/
-export type UIAdapter = (lentiInstance: Lenti) => void;
-/** UIAdapterFactory is an initializing function that is passed options for the UIAdapater it contains. */
+ * @category Managing User Interaction
+ */
 export type UIAdapterFactory = (options?: any) => UIAdapter;
 
-/**
- * Drives viewX/viewY based on the device viewing angle
- * @group UI Adapters
- */
-export const bindGyroscopeXY = (options: {
-  /** changes x values */
-  xBounds: [number, number],
-  /** changes y values */
-  yBounds: [number, number],
-  /** when the deviceorientation listener is initiated, measure values against the start */
-  relative?: boolean,
+export interface bindGyroscopeXYOptions {
+  /** Range of angles in object-space x-rotation */
+  xBounds: [Degree, Degree],
+  /** Range of angles in object-space y-rotation */
+  yBounds: [Degree, Degree],
+  /** @todo: when the deviceorientation listener is initiated, measure values against the start */
+  /** relative?: boolean, */
   /** Some browsers require user gesture before requesting permission. This is the element that will require click if so.
    * By default, this is the Lenti instance's canvas element, but it can be a button or other interactive element.
    */
   userGestureElement?: HTMLElement,
-} = {xBounds: [-45, 45], yBounds: [0,90]}): UIAdapter => {
+}
+/**
+ * Drives viewX/viewY based on the device viewing angle
+ * @category Managing User Interaction
+ * @group Built-in UI Adapters
+ */
+export const bindGyroscopeXY = (options: bindGyroscopeXYOptions = {xBounds: [-45, 45], yBounds: [0,90]}): UIAdapter => {
   const degtorad = Math.PI / 180; // Degree-to-Radian conversion
   /** https://www.w3.org/TR/orientation-event/ */
   const getRotationMatrix = ( alpha, beta, gamma ) => {
@@ -122,14 +145,23 @@ export const bindGyroscopeXY = (options: {
     } else {
       window.addEventListener('deviceorientation', handleOrientation);
     }
+
+    const cleanup = () => {
+      window.removeEventListener('deviceorientation', handleOrientation);
+    }
+    return cleanup
   }
 }
 
 /**
  * Drives viewX/viewY based on the mouse position on the element, in the browser window, or in another element (like a touchstrip element)
- * @group UI Adapters
+ * @category Managing User Interaction
+ * @group Built-in UI Adapters
  */
-export const bindMouseXY = (options: {eventRoot?: HTMLElement | Window | Document | null } = {}): UIAdapter => {
+export const bindMouseXY = (options: {
+  /** The element that the mouse will be tracked on */
+  eventRoot?: HTMLElement | Window | Document | null
+} = {}): UIAdapter => {
   return (lentiInstance: Lenti) => {
     const root = options.eventRoot ?? lentiInstance.canvas
     if (!root) {
@@ -158,6 +190,11 @@ export const bindMouseXY = (options: {eventRoot?: HTMLElement | Window | Documen
       }
     }
     root.addEventListener("mousemove", mouseHandler)
+
+    const cleanup = () => {
+      window.removeEventListener('mousemove', mouseHandler);
+    }
+    return cleanup
   }
 }
 
@@ -165,7 +202,7 @@ export const bindMouseXY = (options: {eventRoot?: HTMLElement | Window | Documen
  * TODOs:
  * - [ ] Add support for pivotted x/y values
  * - [ ] Add support for touch events
- * - [ ] MSAA instead of just rendering higher resolutions
+ * - [ ] MSAA instead of just rendering higher resolutions https://webgpufundamentals.org/webgpu/lessons/webgpu-multisampling.html#a-multisampling
 */
 export class Lenti {
   /** GPU device */
@@ -181,6 +218,7 @@ export class Lenti {
    * @default `[bindMouseXY(), bindGyroscopeXY()]`
    */
   uiAdapters: UIAdapter[] = [bindMouseXY(), bindGyroscopeXY()]
+  uiAdapterCleanupCallbacks: UIAdapterCleanupCallback[] = []
 
   /** Watches canvas visibility */
   #observer: IntersectionObserver;
@@ -225,7 +263,7 @@ export class Lenti {
     /** Amount of y-axis distortion applied to the lenticule simulate vertical off-axis viewing */
     lensDistortion: NormalizedNumber
   } = {
-    stripWidth: 4,
+    stripWidth: 2,
     viewX: 0,
     viewY: 0,
     lensDarkening: 0.2,
@@ -237,7 +275,7 @@ export class Lenti {
     /** Image elements to pull textures from. Also supports ImageData. */
     images: HTMLImageElement[],
     /** UI adapters connect user input to the shader settings, custom adapters can be made  */
-    uiAdapters?: ((this, options: object) => void)[],
+    uiAdapters?: UIAdapter[],
     /** The canvas element */
     canvas: HTMLCanvasElement,
     /** Texture sampler settings. The defaults below are the primary options you may want to change. */
@@ -541,7 +579,12 @@ export class Lenti {
     })
     observer.observe(this.canvas)
 
-    this.uiAdapters.forEach((adapter) => adapter(this))
+    this.uiAdapters.forEach((adapter) => {
+      const optionalCleanup = adapter(this)
+      if (optionalCleanup) {
+        this.uiAdapterCleanupCallbacks.push(optionalCleanup)
+      }
+    })
   }
 
   async createTextureFromImage(imageData: ImageData) {
@@ -578,6 +621,7 @@ export class Lenti {
     return texture;
   }
 
+  /** Updates the instance state with a subset of Lenti's state */
   update(updates: Partial<typeof this.inputs>) {
     Object.entries(updates).forEach(([key, value]) => {
       if (key in this.inputs && typeof value === 'number') {
@@ -587,6 +631,7 @@ export class Lenti {
     this.render();
   }
 
+  /** Renders the current state of the instance */
   render = () => {
     if (!this.isVisible || !this.#device || !this.#uniforms || !this.#uniformBuffer || !this.#pipeline || !this.#context) {
       return
@@ -638,8 +683,17 @@ export class Lenti {
     this.#device.queue.submit([commandBuffer])
   }
 
+  /** Common Lenti errors may be fired from here */
   error(e: Error) {
     console.error(`%c[Lenti Error]: %c${e.message}\n%cCause: %c${e.cause ?? 'N/A'}`, 'font-weight: bold;', '', '');
+  }
+
+  /** Destroys the instance and cleans up resources */
+  destroy() {
+    this.#observer.disconnect()
+    this.#context?.unconfigure()
+    this.#device?.destroy()
+    this.uiAdapterCleanupCallbacks.forEach((cleanup) => cleanup())
   }
 }
 
